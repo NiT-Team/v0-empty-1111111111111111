@@ -1,0 +1,3338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infonit Digital Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #0ea5e9;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #0f172a;
+            --sidebar-width: 260px;
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f1f5f9;
+        }
+        
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .animate-slide-in { animation: slideIn 0.3s ease-out forwards; }
+        
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+        
+        @keyframes slideIn { 
+            from { transform: translateY(20px); opacity: 0; } 
+            to { transform: translateY(0); opacity: 1; } 
+        }
+        
+        .password-field { position: relative; }
+        .toggle-password { 
+            position: absolute; 
+            right: 12px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            cursor: pointer; 
+            color: #6b7280;
+            transition: color 0.2s;
+        }
+        .toggle-password:hover { color: #475569; }
+        
+        .tab-button {
+            padding: 0.75rem 1.25rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #64748b;
+        }
+        .tab-button.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+            background-color: #dbeafe;
+        }
+        .tab-button:hover:not(.active) {
+            background-color: #f1f5f9;
+            color: #475569;
+        }
+        
+        .sidebar {
+            height: calc(100vh - 4rem);
+            width: var(--sidebar-width);
+            transition: all 0.3s ease;
+        }
+        
+        .main-content {
+            transition: all 0.3s ease;
+            margin-left: var(--sidebar-width);
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-active { background-color: #dcfce7; color: #166534; }
+        .status-inactive { background-color: #f3f4f6; color: #4b5563; }
+        .status-maintenance { background-color: #fef9c3; color: #854d0e; }
+        .status-retired { background-color: #fee2e2; color: #b91c1c; }
+        .status-overdue { background-color: #fee2e2; color: #b91c1c; }
+        .status-due-soon { background-color: #fef9c3; color: #854d0e; }
+        .status-scheduled { background-color: #dbeafe; color: #1d4ed8; }
+        .status-completed { background-color: #dcfce7; color: #166534; }
+        
+        .device-card, .asset-card {
+            transition: all 0.2s ease;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .device-card:hover, .asset-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .asset-type-software { border-left: 4px solid #3b82f6; }
+        .asset-type-account { border-left: 4px solid #10b981; }
+        .asset-type-license { border-left: 4px solid #8b5cf6; }
+        .asset-type-subscription { border-left: 4px solid #f59e0b; }
+        
+        .view-toggle button {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            background-color: #e2e8f0;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+        .view-toggle button.active {
+            background-color: #dbeafe;
+            color: var(--primary);
+        }
+        .view-toggle button:hover:not(.active) {
+            background-color: #cbd5e1;
+        }
+        
+        .search-input {
+            transition: all 0.3s ease;
+        }
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            border: 1px solid #d1d5db;
+            background-color: white;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+        .btn-outline:hover {
+            background-color: #f9fafb;
+            border-color: #9ca3af;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+            transition: background-color 0.2s;
+        }
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        
+        .modal-container {
+            max-height: 90vh;
+            max-width: 95vw;
+        }
+        
+        .priority-high { color: var(--danger); }
+        .priority-medium { color: var(--warning); }
+        .priority-low { color: var(--success); }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 40;
+            }
+            .overlay.active {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Login Screen -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md transform transition-all duration-300 hover:shadow-2xl">
+            <div class="text-center mb-8">
+                <div class="mx-auto bg-blue-100 rounded-full p-3 w-16 h-16 flex items-center justify-center mb-4">
+                    <i class="fas fa-network-wired text-blue-600 text-3xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-800">Infonit Digital Management</h1>
+                <p class="text-gray-600 mt-2">Securely manage all your devices and digital assets</p>
+            </div>
+            <form id="login-form">
+                <div class="mb-5">
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-user text-gray-400"></i>
+                        </div>
+                        <input type="text" id="username" name="username" placeholder="Enter your username"
+                            class="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+                    </div>
+                </div>
+                <div class="mb-6 password-field">
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" id="password" name="password" placeholder="Enter your password"
+                            class="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 transition" required>
+                        <span class="toggle-password" onclick="togglePasswordVisibility('password')">👁️</span>
+                    </div>
+                </div>
+                <button type="submit" class="w-full btn-primary py-3 px-4 rounded-lg font-semibold shadow-md hover:bg-blue-700 transition duration-300 transform hover:-translate-y-0.5">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Sign In
+                </button>
+                <p class="text-center mt-4 text-sm text-gray-600">
+                    Don't have an account? <button type="button" id="show-register" class="text-blue-600 hover:underline font-medium">Register</button>
+                </p>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Register Screen -->
+    <div id="register-screen" class="min-h-screen hidden items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md transform transition-all duration-300 hover:shadow-2xl">
+            <div class="text-center mb-8">
+                <div class="mx-auto bg-green-100 rounded-full p-3 w-16 h-16 flex items-center justify-center mb-4">
+                    <i class="fas fa-user-plus text-green-600 text-3xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-800">Create Account</h1>
+                <p class="text-gray-600 mt-2">Join Infonit Digital Management today</p>
+            </div>
+            <form id="register-form">
+                <div class="mb-5">
+                    <label for="reg-username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-user text-gray-400"></i>
+                        </div>
+                        <input type="text" id="reg-username" name="username" placeholder="Choose a username"
+                            class="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+                    </div>
+                </div>
+                <div class="mb-5 password-field">
+                    <label for="reg-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" id="reg-password" name="password" placeholder="Create a password"
+                            class="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 transition" required>
+                        <span class="toggle-password" onclick="togglePasswordVisibility('reg-password')">👁️</span>
+                    </div>
+                </div>
+                <div class="mb-6 password-field">
+                    <label for="reg-confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" id="reg-confirm-password" name="confirmPassword" placeholder="Confirm your password"
+                            class="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 transition" required>
+                        <span class="toggle-password" onclick="togglePasswordVisibility('reg-confirm-password')">👁️</span>
+                    </div>
+                </div>
+                <button type="submit" class="w-full btn-primary py-3 px-4 rounded-lg font-semibold shadow-md hover:bg-blue-700 transition duration-300 transform hover:-translate-y-0.5">
+                    <i class="fas fa-user-check mr-2"></i> Create Account
+                </button>
+                <p class="text-center mt-4 text-sm text-gray-600">
+                    Already have an account? <button type="button" id="show-login" class="text-blue-600 hover:underline font-medium">Login</button>
+                </p>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Main App Screen -->
+    <div id="app-screen" class="hidden">
+        <div class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16 items-center">
+                    <div class="flex items-center">
+                        <button id="menu-toggle" class="md:hidden mr-4 text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <div class="bg-blue-100 rounded-lg p-2 mr-3">
+                            <i class="fas fa-network-wired text-blue-600 text-xl"></i>
+                        </div>
+                        <h1 class="text-xl font-bold text-gray-800">Infonit Digital Management</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="hidden md:flex items-center bg-gray-100 rounded-full px-4 py-1">
+                            <i class="fas fa-search text-gray-500 mr-2"></i>
+                            <input type="text" id="search-input" placeholder="Search devices & assets..."
+                                class="bg-transparent focus:outline-none text-sm w-40 search-input">
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-8 h-8 mr-2"></div>
+                            <span class="text-sm text-gray-600 mr-4">Welcome, <span id="current-user" class="font-medium"></span></span>
+                            <button id="logout-button" class="text-sm text-gray-600 hover:text-gray-900 flex items-center">
+                                <i class="fas fa-sign-out-alt mr-1"></i>
+                                Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex">
+            <!-- Sidebar Navigation -->
+            <aside id="sidebar" class="sidebar bg-white shadow-md fixed md:static z-40">
+                <nav class="p-4">
+                    <ul class="space-y-2">
+                        <li>
+                            <button id="nav-devices" class="w-full text-left px-4 py-3 rounded-lg font-medium bg-blue-50 text-blue-700 flex items-center">
+                                <i class="fas fa-laptop-house mr-3 text-blue-600"></i>
+                                Devices
+                            </button>
+                        </li>
+                        <li>
+                            <button id="nav-assets" class="w-full text-left px-4 py-3 rounded-lg font-medium text-gray-600 hover:bg-gray-100 flex items-center">
+                                <i class="fas fa-cube mr-3 text-gray-500"></i>
+                                Digital Assets
+                            </button>
+                        </li>
+                        <li>
+                            <button id="nav-users" class="w-full text-left px-4 py-3 rounded-lg font-medium text-gray-600 hover:bg-gray-100 flex items-center">
+                                <i class="fas fa-users mr-3 text-gray-500"></i>
+                                Users
+                            </button>
+                        </li>
+                        <li>
+                            <button id="nav-maintenance" class="w-full text-left px-4 py-3 rounded-lg font-medium text-gray-600 hover:bg-gray-100 flex items-center">
+                                <i class="fas fa-tools mr-3 text-gray-500"></i>
+                                Maintenance
+                            </button>
+                        </li>
+                        <li class="pt-6 mt-6 border-t border-gray-200">
+                            <button id="nav-settings" class="w-full text-left px-4 py-3 rounded-lg font-medium text-gray-600 hover:bg-gray-100 flex items-center">
+                                <i class="fas fa-cog mr-3 text-gray-500"></i>
+                                Settings
+                            </button>
+                        </li>
+                        <li>
+                            <button id="nav-reports" class="w-full text-left px-4 py-3 rounded-lg font-medium text-gray-600 hover:bg-gray-100 flex items-center">
+                                <i class="fas fa-chart-bar mr-3 text-gray-500"></i>
+                                Reports
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+            
+            <!-- Main Content -->
+            <main class="main-content flex-grow p-6">
+                <div class="mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center border-b pb-6">
+                    <div class="flex items-center mb-4 lg:mb-0">
+                        <h2 id="section-title" class="text-2xl font-bold text-gray-800">Your Devices</h2>
+                        <span id="item-count" class="ml-3 bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded-full">0 items</span>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="search-input-mobile" placeholder="Search devices & assets..."
+                                class="pl-10 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64 search-input">
+                        </div>
+                        <div class="view-toggle flex bg-gray-100 rounded-lg p-1">
+                            <button id="grid-view" class="active p-2 rounded-md">
+                                <i class="fas fa-th-large"></i>
+                            </button>
+                            <button id="table-view" class="p-2 rounded-md">
+                                <i class="fas fa-table"></i>
+                            </button>
+                        </div>
+                        <button id="add-item-button" class="btn-primary px-4 py-2 rounded-lg font-semibold shadow-md flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Add Item
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Items Grid -->
+                <div id="items-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Items cards will be rendered here -->
+                </div>
+                
+                <!-- Items Table (Hidden by default) -->
+                <div id="items-table-container" class="overflow-x-auto hidden rounded-lg shadow">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr id="table-headers">
+                                <!-- Table headers will be rendered here -->
+                            </tr>
+                        </thead>
+                        <tbody id="items-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Item rows will be rendered here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="no-items-message" class="hidden text-center py-12">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                    </svg>
+                    <h3 class="text-lg font-medium text-gray-900 mb-1">No items found</h3>
+                    <p class="text-gray-500 mb-4">Get started by adding your first item</p>
+                    <button id="add-first-item" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
+                        <i class="fas fa-plus mr-1"></i> Add Item
+                    </button>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Add/Edit Device Modal -->
+    <div id="device-modal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+        <div class="bg-white rounded-xl p-6 shadow-2xl w-full max-w-4xl animate-slide-in overflow-y-auto modal-container">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="device-modal-title" class="text-2xl font-bold text-gray-800">Add New Device</h2>
+                <button id="close-modal" class="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Tab Navigation -->
+            <div class="flex border-b mb-6 overflow-x-auto">
+                <button class="tab-button active flex items-center" data-tab="basic-info">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Basic Info
+                </button>
+                <button class="tab-button flex items-center" data-tab="credentials">
+                    <i class="fas fa-key mr-2"></i>
+                    Credentials
+                </button>
+                <button class="tab-button flex items-center" data-tab="contacts">
+                    <i class="fas fa-address-book mr-2"></i>
+                    Contacts
+                </button>
+                <button class="tab-button flex items-center" data-tab="maintenance">
+                    <i class="fas fa-tools mr-2"></i>
+                    Maintenance
+                </button>
+                <button class="tab-button flex items-center" data-tab="additional-info">
+                    <i class="fas fa-plus-circle mr-2"></i>
+                    Additional Info
+                </button>
+            </div>
+            
+            <form id="device-form">
+                <input type="hidden" id="device-id" value="">
+                <input type="hidden" id="device-unique-code" value="">
+                <!-- Basic Info Tab -->
+                <div id="basic-info-tab" class="tab-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="device-name" class="block text-sm font-medium text-gray-700 mb-2">Device Name*</label>
+                            <input type="text" id="device-name" name="deviceName" placeholder="e.g., Office Printer"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+                        </div>
+                        <div>
+                            <label for="device-model" class="block text-sm font-medium text-gray-700 mb-2">Model</label>
+                            <input type="text" id="device-model" name="deviceModel" placeholder="e.g., HP LaserJet Pro"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="device-ip" class="block text-sm font-medium text-gray-700 mb-2">IP Address*</label>
+                            <input type="text" id="device-ip" name="deviceIp" placeholder="e.g., 192.168.1.1"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+                        </div>
+                        <div>
+                            <label for="device-mac" class="block text-sm font-medium text-gray-700 mb-2">MAC Address</label>
+                            <input type="text" id="device-mac" name="deviceMac" placeholder="e.g., 00:1A:2B:3C:4D:5E"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="device-type" class="block text-sm font-medium text-gray-700 mb-2">Device Type*</label>
+                            <select id="device-type" name="deviceType" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+                                <option value="">Select a type</option>
+                                <option value="Computer">Computer</option>
+                                <option value="Printer">Printer</option>
+                                <option value="Router">Router</option>
+                                <option value="Switch">Switch</option>
+                                <option value="Server">Server</option>
+                                <option value="Mobile">Mobile Device</option>
+                                <option value="IoT">IoT Device</option>
+                                <option value="Other">Other Device</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="device-status" class="block text-sm font-medium text-gray-700 mb-2">Status*</label>
+                            <select id="device-status" name="deviceStatus" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Retired">Retired</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="device-category" class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                            <select id="device-category" name="deviceCategory" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                                <option value="">Select a category</option>
+                                <option value="Networking">Networking</option>
+                                <option value="Computing">Computing</option>
+                                <option value="Printing">Printing</option>
+                                <option value="Storage">Storage</option>
+                                <option value="Security">Security</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="device-location" class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                            <input type="text" id="device-location" name="deviceLocation" placeholder="e.g., Building A, Floor 3, Room 301"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Credentials Tab -->
+                <div id="credentials-tab" class="tab-content hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="password-field">
+                            <label for="device-username" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                            <input type="text" id="device-username" name="deviceUsername" placeholder="Device login username"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                        <div class="password-field">
+                            <label for="device-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                            <input type="password" id="device-password" name="devicePassword" placeholder="Device login password"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 transition">
+                            <span class="toggle-password" onclick="togglePasswordVisibility('device-password')">👁️</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="device-port" class="block text-sm font-medium text-gray-700 mb-2">Port</label>
+                            <input type="number" id="device-port" name="devicePort" placeholder="e.g., 22, 80, 443"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                        <div>
+                            <label for="device-url" class="block text-sm font-medium text-gray-700 mb-2">Management URL</label>
+                            <input type="url" id="device-url" name="deviceUrl" placeholder="e.g., https://192.168.1.1/admin"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="device-access" class="block text-sm font-medium text-gray-700 mb-2">Access Method</label>
+                            <select id="device-access" name="deviceAccess" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                                <option value="">Select access method</option>
+                                <option value="SSH">SSH</option>
+                                <option value="HTTP">HTTP</option>
+                                <option value="HTTPS">HTTPS</option>
+                                <option value="RDP">RDP</option>
+                                <option value="VNC">VNC</option>
+                                <option value="SNMP">SNMP</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <!-- Empty div for spacing -->
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label for="device-creds-notes" class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                        <textarea id="device-creds-notes" name="deviceCredsNotes" rows="3"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Any additional information about the device credentials"></textarea>
+                    </div>
+                </div>
+                
+                <!-- Contacts Tab -->
+                <div id="contacts-tab" class="tab-content hidden">
+                    <div class="mb-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">Primary Contacts</h3>
+                            <button type="button" id="add-primary-contact" class="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+                                <i class="fas fa-plus mr-1"></i> Add Contact
+                            </button>
+                        </div>
+                        <div id="primary-contacts-container" class="space-y-4">
+                            <!-- Primary contacts will be added here -->
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">Secondary Contacts</h3>
+                            <button type="button" id="add-secondary-contact" class="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+                                <i class="fas fa-plus mr-1"></i> Add Contact
+                            </button>
+                        </div>
+                        <div id="secondary-contacts-container" class="space-y-4">
+                            <!-- Secondary contacts will be added here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Maintenance Tab -->
+                <div id="maintenance-tab" class="tab-content hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="device-last-maintenance" class="block text-sm font-medium text-gray-700 mb-2">Last Maintenance Date</label>
+                            <input type="date" id="device-last-maintenance" name="deviceLastMaintenance"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                        <div>
+                            <label for="device-next-maintenance" class="block text-sm font-medium text-gray-700 mb-2">Next Maintenance Date</label>
+                            <input type="date" id="device-next-maintenance" name="deviceNextMaintenance"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="device-maintenance-interval" class="block text-sm font-medium text-gray-700 mb-2">Maintenance Interval (Days)</label>
+                            <input type="number" id="device-maintenance-interval" name="deviceMaintenanceInterval" placeholder="e.g., 30"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                        <div>
+                            <label for="device-maintenance-status" class="block text-sm font-medium text-gray-700 mb-2">Maintenance Status</label>
+                            <select id="device-maintenance-status" name="deviceMaintenanceStatus" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                                <option value="">Select status</option>
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Overdue">Overdue</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="device-maintenance-priority" class="block text-sm font-medium text-gray-700 mb-2">Maintenance Priority</label>
+                            <select id="device-maintenance-priority" name="deviceMaintenancePriority" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                                <option value="">Select priority</option>
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                                <option value="Critical">Critical</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="device-maintenance-cost" class="block text-sm font-medium text-gray-700 mb-2">Estimated Cost ($)</label>
+                            <input type="number" id="device-maintenance-cost" name="deviceMaintenanceCost" step="0.01" placeholder="e.g., 150.00"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label for="device-maintenance-notes" class="block text-sm font-medium text-gray-700 mb-2">Maintenance Notes</label>
+                        <textarea id="device-maintenance-notes" name="deviceMaintenanceNotes" rows="3"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Details about maintenance requirements"></textarea>
+                    </div>
+                    
+                    <!-- Spare Parts Section -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">Spare Parts Inventory</h3>
+                            <button type="button" id="add-spare-part" class="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+                                <i class="fas fa-plus mr-1"></i> Add Spare Part
+                            </button>
+                        </div>
+                        <div id="spare-parts-container" class="space-y-4">
+                            <!-- Spare parts will be added here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Info Tab -->
+                <div id="additional-info-tab" class="tab-content hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="device-version" class="block text-sm font-medium text-gray-700 mb-2">Version</label>
+                            <input type="text" id="device-version" name="deviceVersion" placeholder="e.g., 2023, v2.1"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                        <div>
+                            <label for="device-tags" class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                            <input type="text" id="device-tags" name="deviceTags" placeholder="e.g., design, creative, premium"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="device-support-contact" class="block text-sm font-medium text-gray-700 mb-2">Support Contact</label>
+                            <input type="text" id="device-support-contact" name="deviceSupportContact" placeholder="e.g., support@vendor.com"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                        <div>
+                            <label for="device-support-phone" class="block text-sm font-medium text-gray-700 mb-2">Support Phone</label>
+                            <input type="tel" id="device-support-phone" name="deviceSupportPhone" placeholder="e.g., +1 (800) 123-4567"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="device-purchase-date" class="block text-sm font-medium text-gray-700 mb-2">Purchase Date</label>
+                            <input type="date" id="device-purchase-date" name="devicePurchaseDate"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                        <div>
+                            <label for="device-warranty" class="block text-sm font-medium text-gray-700 mb-2">Warranty Expiry</label>
+                            <input type="date" id="device-warranty" name="deviceWarranty"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="device-vendor" class="block text-sm font-medium text-gray-700 mb-2">Vendor/Supplier</label>
+                            <input type="text" id="device-vendor" name="deviceVendor" placeholder="Company name"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                        <div>
+                            <label for="device-serial" class="block text-sm font-medium text-gray-700 mb-2">Serial Number</label>
+                            <input type="text" id="device-serial" name="deviceSerial" placeholder="Device serial number"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label for="device-notes" class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                        <textarea id="device-notes" name="deviceNotes" rows="4"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Any additional information about the device"></textarea>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end gap-3 pt-6 border-t">
+                    <button type="button" id="cancel-device-button" class="px-5 py-2.5 btn-outline rounded-lg font-medium transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 btn-primary rounded-lg font-medium transition flex items-center">
+                        <i class="fas fa-save mr-2"></i> Save Device
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Device Detail Modal -->
+    <div id="detail-modal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+        <div class="bg-white rounded-xl p-6 shadow-2xl w-full max-w-4xl animate-slide-in overflow-y-auto modal-container">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="detail-title" class="text-2xl font-bold text-gray-800">Device Details</h2>
+                <button id="close-detail-modal" class="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Tab Navigation -->
+            <div class="flex border-b mb-6 overflow-x-auto">
+                <button class="tab-button active flex items-center" data-tab="detail-basic">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Basic Info
+                </button>
+                <button class="tab-button flex items-center" data-tab="detail-creds">
+                    <i class="fas fa-key mr-2"></i>
+                    Credentials
+                </button>
+                <button class="tab-button flex items-center" data-tab="detail-contacts">
+                    <i class="fas fa-address-book mr-2"></i>
+                    Contacts
+                </button>
+                <button class="tab-button flex items-center" data-tab="detail-maintenance">
+                    <i class="fas fa-tools mr-2"></i>
+                    Maintenance
+                </button>
+                <button class="tab-button flex items-center" data-tab="detail-more">
+                    <i class="fas fa-plus-circle mr-2"></i>
+                    More Info
+                </button>
+            </div>
+            
+            <div id="detail-content">
+                <!-- Basic Info Tab -->
+                <div id="detail-basic-tab" class="tab-content space-y-6">
+                    <!-- Basic info will be rendered here -->
+                </div>
+                
+                <!-- Credentials Tab -->
+                <div id="detail-creds-tab" class="tab-content hidden space-y-6">
+                    <!-- Credentials will be rendered here -->
+                </div>
+                
+                <!-- Contacts Tab -->
+                <div id="detail-contacts-tab" class="tab-content hidden space-y-6">
+                    <!-- Contacts will be rendered here -->
+                </div>
+                
+                <!-- Maintenance Tab -->
+                <div id="detail-maintenance-tab" class="tab-content hidden space-y-6">
+                    <!-- Maintenance info will be rendered here -->
+                </div>
+                
+                <!-- More Info Tab -->
+                <div id="detail-more-tab" class="tab-content hidden space-y-6">
+                    <!-- Additional info will be rendered here -->
+                </div>
+            </div>
+            
+            <div class="flex justify-end pt-6 border-t mt-6">
+                <button id="close-detail-button" class="px-5 py-2.5 btn-primary rounded-lg font-medium transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+        <div class="bg-white rounded-xl p-6 shadow-2xl w-full max-w-md animate-slide-in">
+            <div class="text-center">
+                <div class="mx-auto bg-red-100 rounded-full p-3 w-12 h-12 flex items-center justify-center mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Confirm Deletion</h2>
+                <p id="confirm-message" class="mb-6 text-gray-600">Are you sure you want to delete this item?</p>
+                <div class="flex justify-center gap-3">
+                    <button type="button" id="cancel-delete-button" class="px-5 py-2.5 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium transition">
+                        Cancel
+                    </button>
+                    <button type="button" id="confirm-delete-button" class="px-5 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Users Management Modal -->
+    <div id="users-modal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+        <div class="bg-white rounded-xl p-6 shadow-2xl w-full max-w-4xl animate-slide-in overflow-y-auto modal-container">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">User Management</h2>
+                <button id="close-users-modal" class="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="mb-6">
+                <button id="add-user-button" class="btn-primary px-4 py-2 rounded-lg font-semibold shadow-md flex items-center">
+                    <i class="fas fa-plus mr-2"></i> Add User
+                </button>
+            </div>
+            <div class="overflow-x-auto rounded-lg shadow">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Devices</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assets</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body" class="bg-white divide-y divide-gray-200">
+                        <!-- User rows will be rendered here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add/Edit User Modal -->
+    <div id="user-modal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+        <div class="bg-white rounded-xl p-6 shadow-2xl w-full max-w-md animate-slide-in">
+            <h2 id="user-modal-title" class="text-2xl font-bold text-gray-800 mb-4">Add New User</h2>
+            <form id="user-form">
+                <input type="hidden" id="user-id" value="">
+                <input type="hidden" id="user-unique-code" value="">
+                <div class="mb-4">
+                    <label for="user-username" class="block text-sm font-medium text-gray-700 mb-2">Username*</label>
+                    <input type="text" id="user-username" name="userUsername" placeholder="Enter username"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+                </div>
+                <div class="mb-4">
+                    <label for="user-role" class="block text-sm font-medium text-gray-700 mb-2">Role*</label>
+                    <select id="user-role" name="userRole" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+                        <option value="">Select a role</option>
+                        <option value="admin">Administrator</option>
+                        <option value="user">User</option>
+                        <option value="viewer">Viewer</option>
+                    </select>
+                </div>
+                <div class="mb-4 password-field">
+                    <label for="user-password" class="block text-sm font-medium text-gray-700 mb-2">Password*</label>
+                    <input type="password" id="user-password" name="userPassword" placeholder="Enter password"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 transition" required>
+                    <span class="toggle-password" onclick="togglePasswordVisibility('user-password')">👁️</span>
+                </div>
+                <div class="mb-6 password-field">
+                    <label for="user-confirm-password" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password*</label>
+                    <input type="password" id="user-confirm-password" name="userConfirmPassword" placeholder="Confirm password"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 transition" required>
+                    <span class="toggle-password" onclick="togglePasswordVisibility('user-confirm-password')">👁️</span>
+                </div>
+                <div class="flex justify-end gap-3 pt-4 border-t">
+                    <button type="button" id="cancel-user-button" class="px-5 py-2.5 btn-outline rounded-lg font-medium transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 btn-primary rounded-lg font-medium transition flex items-center">
+                        <i class="fas fa-save mr-2"></i> Save User
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Maintenance Schedule Modal -->
+    <div id="maintenance-modal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+        <div class="bg-white rounded-xl p-6 shadow-2xl w-full max-w-6xl animate-slide-in overflow-y-auto modal-container">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Maintenance Schedule</h2>
+                <button id="close-maintenance-modal" class="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="mb-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">Upcoming Maintenance Tasks</h3>
+                        <p class="text-sm text-gray-600">Tasks due within the next 30 days</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="add-maintenance-task" class="btn-primary px-4 py-2 rounded-lg font-semibold shadow-md flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Add Task
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto rounded-lg shadow">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Device</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Task</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="maintenance-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Maintenance tasks will be rendered here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Maintenance History</h3>
+                <div class="overflow-x-auto rounded-lg shadow">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Device</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Task</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Completed Date</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Technician</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="maintenance-history-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Maintenance history will be rendered here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="flex justify-end pt-6 border-t mt-6">
+                <button id="close-maintenance-button" class="px-5 py-2.5 btn-primary rounded-lg font-medium transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add/Edit Maintenance Task Modal -->
+    <div id="maintenance-task-modal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+        <div class="bg-white rounded-xl p-6 shadow-2xl w-full max-w-2xl animate-slide-in overflow-y-auto modal-container">
+            <h2 id="maintenance-task-modal-title" class="text-2xl font-bold text-gray-800 mb-4">Add Maintenance Task</h2>
+            <form id="maintenance-task-form">
+                <input type="hidden" id="task-id" value="">
+                <input type="hidden" id="task-device-id" value="">
+                <div class="mb-4">
+                    <label for="task-device" class="block text-sm font-medium text-gray-700 mb-2">Device*</label>
+                    <select id="task-device" name="taskDevice" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+                        <option value="">Select a device</option>
+                        <!-- Device options will be populated here -->
+                    </select>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="task-name" class="block text-sm font-medium text-gray-700 mb-2">Task Name*</label>
+                        <input type="text" id="task-name" name="taskName" placeholder="e.g., Replace Toner Cartridge"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+                    </div>
+                    <div>
+                        <label for="task-due-date" class="block text-sm font-medium text-gray-700 mb-2">Due Date*</label>
+                        <input type="date" id="task-due-date" name="taskDueDate"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="task-priority" class="block text-sm font-medium text-gray-700 mb-2">Priority*</label>
+                        <select id="task-priority" name="taskPriority" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+                            <option value="">Select priority</option>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="task-status" class="block text-sm font-medium text-gray-700 mb-2">Status*</label>
+                        <select id="task-status" name="taskStatus" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+                            <option value="">Select status</option>
+                            <option value="Scheduled">Scheduled</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Overdue">Overdue</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="task-description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <textarea id="task-description" name="taskDescription" rows="3"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Detailed description of the maintenance task"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="task-assigned-to" class="block text-sm font-medium text-gray-700 mb-2">Assigned To</label>
+                    <input type="text" id="task-assigned-to" name="taskAssignedTo" placeholder="e.g., John Smith"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label for="task-cost" class="block text-sm font-medium text-gray-700 mb-2">Estimated Cost ($)</label>
+                        <input type="number" id="task-cost" name="taskCost" step="0.01" placeholder="e.g., 150.00"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    </div>
+                    <div>
+                        <label for="task-duration" class="block text-sm font-medium text-gray-700 mb-2">Estimated Duration (Hours)</label>
+                        <input type="number" id="task-duration" name="taskDuration" step="0.5" placeholder="e.g., 2.5"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    </div>
+                </div>
+                
+                <!-- Spare Parts Section -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Required Spare Parts</h3>
+                    <div id="task-spare-parts-container" class="space-y-4">
+                        <!-- Spare parts will be added here -->
+                    </div>
+                    <button type="button" id="add-task-spare-part" class="mt-4 text-sm text-blue-600 hover:text-blue-800 flex items-center">
+                        <i class="fas fa-plus mr-1"></i> Add Spare Part
+                    </button>
+                </div>
+                
+                <div class="flex justify-end gap-3 pt-4 border-t">
+                    <button type="button" id="cancel-maintenance-task-button" class="px-5 py-2.5 btn-outline rounded-lg font-medium transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 btn-primary rounded-lg font-medium transition flex items-center">
+                        <i class="fas fa-save mr-2"></i> Save Task
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // --- Data Storage ---
+        let users = JSON.parse(localStorage.getItem('users')) || [
+            { 
+                id: 1,
+                username: 'admin', 
+                password: 'admin123', 
+                role: 'admin',
+                uniqueCode: 'USR-001',
+                devices: [
+                    { 
+                        id: 1, 
+                        name: 'Office Printer', 
+                        model: 'HP LaserJet Pro M404dn',
+                        ip: '192.168.1.100', 
+                        mac: '00:1A:2B:3C:4D:5E', 
+                        type: 'Printer', 
+                        status: 'Active', 
+                        category: 'Printing',
+                        location: 'Building A, Floor 2, Room 205',
+                        username: 'admin', 
+                        password: 'print123', 
+                        port: 9100,
+                        url: 'http://192.168.1.100',
+                        access: 'HTTP',
+                        primaryContacts: [
+                            { name: 'John Smith', role: 'IT Manager', email: 'john.smith@company.com', phone: '+1 (555) 123-4567' },
+                            { name: 'Sarah Johnson', role: 'Network Admin', email: 'sarah.j@company.com', phone: '+1 (555) 987-6543' }
+                        ],
+                        secondaryContacts: [
+                            { name: 'Mike Brown', role: 'Vendor Support', email: 'mike.brown@hpsupport.com', phone: '+1 (800) 123-4567' }
+                        ],
+                        notes: 'Color laser printer in main office. Requires monthly maintenance.',
+                        purchaseDate: '2022-05-15',
+                        warrantyExpiry: '2025-05-15',
+                        vendor: 'HP Direct',
+                        serial: 'CN12345678',
+                        lastMaintenance: '2023-07-20',
+                        nextMaintenance: '2023-10-20',
+                        maintenanceInterval: 90,
+                        maintenanceStatus: 'Scheduled',
+                        maintenanceNotes: 'Monthly cleaning and toner replacement',
+                        spareParts: [
+                            { id: 1, name: 'Toner Cartridge', partNumber: 'HP Q7516A', quantity: 5, supplier: 'HP Direct' },
+                            { id: 2, name: 'Fuser Kit', partNumber: 'HP C7115X', quantity: 2, supplier: 'HP Direct' }
+                        ],
+                        lastUpdated: '2023-08-15' 
+                    }
+                ],
+                assets: [
+                    { 
+                        id: 1, 
+                        name: 'Adobe Creative Cloud', 
+                        type: 'Software',
+                        vendor: 'Adobe',
+                        status: 'Active',
+                        category: 'Design',
+                        location: 'Design Department',
+                        username: 'design@company.com',
+                        password: 'creative123',
+                        url: 'https://account.adobe.com',
+                        accountType: 'Admin',
+                        notes: 'Used by all designers in the company',
+                        licenseKey: 'XXXX-XXXX-XXXX-XXXX',
+                        licenseType: 'Subscription',
+                        purchaseDate: '2023-01-15',
+                        expirationDate: '2024-01-15',
+                        seats: 15,
+                        renewalReminder: 30,
+                        licenseNotes: 'Annual subscription with auto-renewal',
+                        version: '2023',
+                        tags: 'design, creative, premium',
+                        supportContact: 'support@adobe.com',
+                        supportPhone: '+1 (800) 123-4567',
+                        description: 'Complete creative suite for graphic design, video editing, and web development',
+                        lastUpdated: '2023-08-15' 
+                    }
+                ],
+                maintenanceTasks: [
+                    {
+                        id: 1,
+                        deviceId: 1,
+                        deviceName: 'Office Printer',
+                        name: 'Replace Toner Cartridge',
+                        dueDate: '2023-10-20',
+                        priority: 'High',
+                        status: 'Scheduled',
+                        description: 'Replace black toner cartridge when low indicator appears',
+                        assignedTo: 'John Smith',
+                        cost: 120.00,
+                        duration: 1.5,
+                        spareParts: [
+                            { id: 1, name: 'Toner Cartridge', partNumber: 'HP Q7516A', quantity: 1, supplier: 'HP Direct' }
+                        ],
+                        completedDate: null
+                    },
+                    {
+                        id: 2,
+                        deviceId: 1,
+                        deviceName: 'Office Printer',
+                        name: 'Clean Print Heads',
+                        dueDate: '2023-09-15',
+                        priority: 'Medium',
+                        status: 'Completed',
+                        description: 'Monthly cleaning of print heads to prevent clogging',
+                        assignedTo: 'Sarah Johnson',
+                        cost: 0,
+                        duration: 1,
+                        spareParts: [],
+                        completedDate: '2023-09-15'
+                    }
+                ]
+            }
+        ];
+        let currentUser = null;
+        let devices = [];
+        let assets = [];
+        let maintenanceTasks = [];
+        let currentView = 'devices'; // 'devices', 'assets', 'users', 'maintenance'
+        let nextContactId = 1;
+        let nextSparePartId = 1;
+        let displayMode = 'grid'; // 'grid' or 'table'
+        
+        // --- DOM Elements ---
+        const loginScreen = document.getElementById('login-screen');
+        const registerScreen = document.getElementById('register-screen');
+        const appScreen = document.getElementById('app-screen');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const showRegister = document.getElementById('show-register');
+        const showLogin = document.getElementById('show-login');
+        const logoutButton = document.getElementById('logout-button');
+        const currentUserSpan = document.getElementById('current-user');
+        const itemsGrid = document.getElementById('items-grid');
+        const itemsTableBody = document.getElementById('items-table-body');
+        const tableHeaders = document.getElementById('table-headers');
+        const searchInput = document.getElementById('search-input');
+        const searchInputMobile = document.getElementById('search-input-mobile');
+        const addItemButton = document.getElementById('add-item-button');
+        const addFirstItem = document.getElementById('add-first-item');
+        const deviceModal = document.getElementById('device-modal');
+        const deviceModalTitle = document.getElementById('device-modal-title');
+        const deviceForm = document.getElementById('device-form');
+        const deviceIdInput = document.getElementById('device-id');
+        const deviceUniqueCodeInput = document.getElementById('device-unique-code');
+        const deviceNameInput = document.getElementById('device-name');
+        const deviceModelInput = document.getElementById('device-model');
+        const deviceIpInput = document.getElementById('device-ip');
+        const deviceMacInput = document.getElementById('device-mac');
+        const deviceTypeInput = document.getElementById('device-type');
+        const deviceStatusInput = document.getElementById('device-status');
+        const deviceCategoryInput = document.getElementById('device-category');
+        const deviceLocationInput = document.getElementById('device-location');
+        const deviceUsernameInput = document.getElementById('device-username');
+        const devicePasswordInput = document.getElementById('device-password');
+        const devicePortInput = document.getElementById('device-port');
+        const deviceUrlInput = document.getElementById('device-url');
+        const deviceAccessInput = document.getElementById('device-access');
+        const deviceCredsNotesInput = document.getElementById('device-creds-notes');
+        const primaryContactsContainer = document.getElementById('primary-contacts-container');
+        const secondaryContactsContainer = document.getElementById('secondary-contacts-container');
+        const addPrimaryContactBtn = document.getElementById('add-primary-contact');
+        const addSecondaryContactBtn = document.getElementById('add-secondary-contact');
+        const deviceLastMaintenanceInput = document.getElementById('device-last-maintenance');
+        const deviceNextMaintenanceInput = document.getElementById('device-next-maintenance');
+        const deviceMaintenanceIntervalInput = document.getElementById('device-maintenance-interval');
+        const deviceMaintenanceStatusInput = document.getElementById('device-maintenance-status');
+        const deviceMaintenancePriorityInput = document.getElementById('device-maintenance-priority');
+        const deviceMaintenanceCostInput = document.getElementById('device-maintenance-cost');
+        const deviceMaintenanceNotesInput = document.getElementById('device-maintenance-notes');
+        const sparePartsContainer = document.getElementById('spare-parts-container');
+        const addSparePartBtn = document.getElementById('add-spare-part');
+        const deviceVersionInput = document.getElementById('device-version');
+        const deviceTagsInput = document.getElementById('device-tags');
+        const deviceSupportContactInput = document.getElementById('device-support-contact');
+        const deviceSupportPhoneInput = document.getElementById('device-support-phone');
+        const devicePurchaseDateInput = document.getElementById('device-purchase-date');
+        const deviceWarrantyInput = document.getElementById('device-warranty');
+        const deviceVendorInput = document.getElementById('device-vendor');
+        const deviceSerialInput = document.getElementById('device-serial');
+        const deviceNotesInput = document.getElementById('device-notes');
+        const cancelDeviceButton = document.getElementById('cancel-device-button');
+        const detailModal = document.getElementById('detail-modal');
+        const detailTitle = document.getElementById('detail-title');
+        const detailContent = document.getElementById('detail-content');
+        const detailBasicTab = document.getElementById('detail-basic-tab');
+        const detailCredsTab = document.getElementById('detail-creds-tab');
+        const detailContactsTab = document.getElementById('detail-contacts-tab');
+        const detailMaintenanceTab = document.getElementById('detail-maintenance-tab');
+        const detailMoreTab = document.getElementById('detail-more-tab');
+        const closeDetailButton = document.getElementById('close-detail-modal');
+        const closeDetailModalBtn = document.getElementById('close-detail-modal');
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmMessage = document.getElementById('confirm-message');
+        const cancelDeleteButton = document.getElementById('cancel-delete-button');
+        const confirmDeleteButton = document.getElementById('confirm-delete-button');
+        const itemCount = document.getElementById('item-count');
+        const noItemsMessage = document.getElementById('no-items-message');
+        const closeModalBtn = document.getElementById('close-modal');
+        const closeDetailModalBtn2 = document.getElementById('close-detail-modal');
+        const closeDetailButton2 = document.getElementById('close-detail-button');
+        const sectionTitle = document.getElementById('section-title');
+        const navDevices = document.getElementById('nav-devices');
+        const navAssets = document.getElementById('nav-assets');
+        const navUsers = document.getElementById('nav-users');
+        const navMaintenance = document.getElementById('nav-maintenance');
+        const navSettings = document.getElementById('nav-settings');
+        const navReports = document.getElementById('nav-reports');
+        const gridViewBtn = document.getElementById('grid-view');
+        const tableViewBtn = document.getElementById('table-view');
+        const itemsTableContainer = document.getElementById('items-table-container');
+        const maintenanceModal = document.getElementById('maintenance-modal');
+        const closeMaintenanceModalBtn = document.getElementById('close-maintenance-modal');
+        const closeMaintenanceButton = document.getElementById('close-maintenance-button');
+        const maintenanceTableBody = document.getElementById('maintenance-table-body');
+        const maintenanceHistoryTableBody = document.getElementById('maintenance-history-table-body');
+        const addMaintenanceTaskBtn = document.getElementById('add-maintenance-task');
+        const maintenanceTaskModal = document.getElementById('maintenance-task-modal');
+        const maintenanceTaskModalTitle = document.getElementById('maintenance-task-modal-title');
+        const maintenanceTaskForm = document.getElementById('maintenance-task-form');
+        const taskIdInput = document.getElementById('task-id');
+        const taskDeviceIdInput = document.getElementById('task-device-id');
+        const taskDeviceSelect = document.getElementById('task-device');
+        const taskNameInput = document.getElementById('task-name');
+        const taskDueDateInput = document.getElementById('task-due-date');
+        const taskPriorityInput = document.getElementById('task-priority');
+        const taskStatusInput = document.getElementById('task-status');
+        const taskDescriptionInput = document.getElementById('task-description');
+        const taskAssignedToInput = document.getElementById('task-assigned-to');
+        const taskCostInput = document.getElementById('task-cost');
+        const taskDurationInput = document.getElementById('task-duration');
+        const taskSparePartsContainer = document.getElementById('task-spare-parts-container');
+        const addTaskSparePartBtn = document.getElementById('add-task-spare-part');
+        const cancelMaintenanceTaskButton = document.getElementById('cancel-maintenance-task-button');
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const usersModal = document.getElementById('users-modal');
+        const closeUsersModalBtn = document.getElementById('close-users-modal');
+        const addUserButton = document.getElementById('add-user-button');
+        const usersTableBody = document.getElementById('users-table-body');
+        const userModal = document.getElementById('user-modal');
+        const userModalTitle = document.getElementById('user-modal-title');
+        const userForm = document.getElementById('user-form');
+        const userIdInput = document.getElementById('user-id');
+        const userUniqueCodeInput = document.getElementById('user-unique-code');
+        const userUsernameInput = document.getElementById('user-username');
+        const userRoleInput = document.getElementById('user-role');
+        const userPasswordInput = document.getElementById('user-password');
+        const userConfirmPasswordInput = document.getElementById('user-confirm-password');
+        const cancelUserButton = document.getElementById('cancel-user-button');
+        
+        // --- Utility Functions ---
+        function togglePasswordVisibility(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = field.nextElementSibling.querySelector('i');
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                field.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+        
+        function saveUsers() {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+        
+        function loadUserDevices() {
+            if (!currentUser) return;
+            const user = users.find(u => u.username === currentUser);
+            devices = user ? [...user.devices] : [];
+            assets = user ? [...user.assets] : [];
+            maintenanceTasks = user ? [...user.maintenanceTasks] : [];
+            renderItems();
+        }
+        
+        function saveUserDevices() {
+            if (!currentUser) return;
+            const userIndex = users.findIndex(u => u.username === currentUser);
+            if (userIndex !== -1) {
+                users[userIndex].devices = [...devices];
+                users[userIndex].assets = [...assets];
+                users[userIndex].maintenanceTasks = [...maintenanceTasks];
+                saveUsers();
+            }
+        }
+        
+        function createContactFieldset(contactType, contactData = {}) {
+            const contactId = nextContactId++;
+            const fieldset = document.createElement('div');
+            fieldset.className = 'border p-4 rounded-lg bg-gray-50';
+            fieldset.dataset.contactId = contactId;
+            fieldset.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="${contactType}-contact-name-${contactId}" class="block text-sm font-medium text-gray-700">Name*</label>
+                        <input type="text" id="${contactType}-contact-name-${contactId}" name="${contactType}Contacts[${contactId}][name]" 
+                            value="${contactData.name || ''}" placeholder="Full name" 
+                            class="mt-1 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+                    </div>
+                    <div>
+                        <label for="${contactType}-contact-role-${contactId}" class="block text-sm font-medium text-gray-700">Role</label>
+                        <input type="text" id="${contactType}-contact-role-${contactId}" name="${contactType}Contacts[${contactId}][role]" 
+                            value="${contactData.role || ''}" placeholder="e.g., IT Manager" 
+                            class="mt-1 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="${contactType}-contact-email-${contactId}" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="${contactType}-contact-email-${contactId}" name="${contactType}Contacts[${contactId}][email]" 
+                            value="${contactData.email || ''}" placeholder="email@example.com" 
+                            class="mt-1 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    </div>
+                    <div>
+                        <label for="${contactType}-contact-phone-${contactId}" class="block text-sm font-medium text-gray-700">Phone</label>
+                        <input type="tel" id="${contactType}-contact-phone-${contactId}" name="${contactType}Contacts[${contactId}][phone]" 
+                            value="${contactData.phone || ''}" placeholder="+1 (555) 123-4567" 
+                            class="mt-1 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" class="text-red-600 hover:text-red-800 text-sm remove-contact flex items-center" data-contact-type="${contactType}">
+                        <i class="fas fa-trash-alt mr-1"></i> Remove Contact
+                    </button>
+                </div>
+            `;
+            return fieldset;
+        }
+        
+        function createSparePartFieldset(partData = {}) {
+            const partId = nextSparePartId++;
+            const fieldset = document.createElement('div');
+            fieldset.className = 'border p-4 rounded-lg bg-gray-50';
+            fieldset.dataset.partId = partId;
+            fieldset.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="spare-part-name-${partId}" class="block text-sm font-medium text-gray-700">Part Name*</label>
+                        <input type="text" id="spare-part-name-${partId}" name="spareParts[${partId}][name]" 
+                            value="${partData.name || ''}" placeholder="e.g., Toner Cartridge" 
+                            class="mt-1 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+                    </div>
+                    <div>
+                        <label for="spare-part-part-number-${partId}" class="block text-sm font-medium text-gray-700">Part Number</label>
+                        <input type="text" id="spare-part-part-number-${partId}" name="spareParts[${partId}][partNumber]" 
+                            value="${partData.partNumber || ''}" placeholder="e.g., HP Q7516A" 
+                            class="mt-1 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="spare-part-quantity-${partId}" class="block text-sm font-medium text-gray-700">Quantity</label>
+                        <input type="number" id="spare-part-quantity-${partId}" name="spareParts[${partId}][quantity]" 
+                            value="${partData.quantity || ''}" placeholder="e.g., 5" 
+                            class="mt-1 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    </div>
+                    <div>
+                        <label for="spare-part-supplier-${partId}" class="block text-sm font-medium text-gray-700">Supplier</label>
+                        <input type="text" id="spare-part-supplier-${partId}" name="spareParts[${partId}][supplier]" 
+                            value="${partData.supplier || ''}" placeholder="e.g., HP Direct" 
+                            class="mt-1 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" class="text-red-600 hover:text-red-800 text-sm remove-spare-part flex items-center" data-part-id="${partId}">
+                        <i class="fas fa-trash-alt mr-1"></i> Remove Part
+                    </button>
+                </div>
+            `;
+            return fieldset;
+        }
+        
+        function renderItems(filteredItems = currentView === 'devices' ? devices : assets) {
+            // Update section title and count
+            if (currentView === 'devices') {
+                sectionTitle.textContent = 'Your Devices';
+                itemCount.textContent = `${filteredItems.length} device${filteredItems.length !== 1 ? 's' : ''}`;
+            } else if (currentView === 'assets') {
+                sectionTitle.textContent = 'Your Digital Assets';
+                itemCount.textContent = `${filteredItems.length} asset${filteredItems.length !== 1 ? 's' : ''}`;
+            } else if (currentView === 'maintenance') {
+                sectionTitle.textContent = 'Maintenance Schedule';
+                renderMaintenanceSchedule();
+                return;
+            } else if (currentView === 'users') {
+                sectionTitle.textContent = 'User Management';
+                renderUsers();
+                return;
+            }
+            
+            // Show/hide no items message
+            if (filteredItems.length === 0) {
+                itemsGrid.classList.add('hidden');
+                itemsTableContainer.classList.add('hidden');
+                noItemsMessage.classList.remove('hidden');
+                return;
+            } else {
+                noItemsMessage.classList.add('hidden');
+            }
+            
+            if (displayMode === 'grid') {
+                itemsGrid.classList.remove('hidden');
+                itemsTableContainer.classList.add('hidden');
+                renderGrid(filteredItems);
+            } else {
+                itemsGrid.classList.add('hidden');
+                itemsTableContainer.classList.remove('hidden');
+                renderTable(filteredItems);
+            }
+        }
+        
+        function renderGrid(filteredItems) {
+            itemsGrid.innerHTML = '';
+            filteredItems.forEach(item => {
+                const statusClass = item.status === 'Active' ? 'status-active' : 
+                                  item.status === 'Inactive' ? 'status-inactive' : 
+                                  item.status === 'Maintenance' ? 'status-maintenance' :
+                                  'status-retired';
+                
+                const itemCard = document.createElement('div');
+                itemCard.className = `device-card bg-white overflow-hidden ${currentView === 'assets' ? `asset-type-${item.type.toLowerCase()}` : ''}`;
+                itemCard.dataset.id = item.id;
+                
+                if (currentView === 'devices') {
+                    itemCard.innerHTML = `
+                        <div class="p-5">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-900">${item.name}</h3>
+                                    <p class="text-gray-600 text-sm">${item.model || 'No model specified'}</p>
+                                </div>
+                                <span class="status-badge ${statusClass}">
+                                    ${item.status}
+                                </span>
+                            </div>
+                            <div class="mt-4 flex items-center text-sm text-gray-600">
+                                <i class="fas fa-network-wired text-gray-500 mr-2"></i>
+                                <span>${item.ip}</span>
+                            </div>
+                            <div class="mt-2 flex items-center text-sm text-gray-600">
+                                <i class="fas fa-laptop text-gray-500 mr-2"></i>
+                                <span>${item.type}</span>
+                            </div>
+                            ${item.location ? `
+                            <div class="mt-2 flex items-center text-sm text-gray-600">
+                                <i class="fas fa-map-marker-alt text-gray-500 mr-2"></i>
+                                <span>${item.location}</span>
+                            </div>
+                            ` : ''}
+                            <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                                <div class="flex items-center">
+                                    ${item.primaryContacts && item.primaryContacts.length > 0 ? `
+                                    <div class="flex -space-x-2">
+                                        ${item.primaryContacts.slice(0, 3).map(() => `
+                                            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-8 h-8"></div>
+                                        `).join('')}
+                                        ${item.primaryContacts.length > 3 ? `
+                                        <div class="bg-gray-100 border-2 border-dashed rounded-xl w-8 h-8 flex items-center justify-center text-xs font-medium text-gray-600">
+                                            +${item.primaryContacts.length - 3}
+                                        </div>
+                                        ` : ''}
+                                    </div>
+                                    ` : `
+                                    <span class="text-xs text-gray-500">No contacts</span>
+                                    `}
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button class="text-gray-500 hover:text-blue-600 p-1.5 rounded-full hover:bg-blue-50 edit-button" data-id="${item.id}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-gray-500 hover:text-red-600 p-1.5 rounded-full hover:bg-red-50 delete-button" data-id="${item.id}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    itemCard.innerHTML = `
+                        <div class="p-5">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-900">${item.name}</h3>
+                                    <p class="text-gray-600 text-sm">${item.vendor || 'No vendor specified'}</p>
+                                </div>
+                                <span class="status-badge ${statusClass}">
+                                    ${item.status}
+                                </span>
+                            </div>
+                            <div class="mt-4 flex items-center text-sm text-gray-600">
+                                <i class="fas fa-cube text-gray-500 mr-2"></i>
+                                <span>${item.type}</span>
+                            </div>
+                            <div class="mt-2 flex items-center text-sm text-gray-600">
+                                <i class="fas fa-folder text-gray-500 mr-2"></i>
+                                <span>${item.category || 'Uncategorized'}</span>
+                            </div>
+                            ${item.expirationDate ? `
+                            <div class="mt-2 flex items-center text-sm text-gray-600">
+                                <i class="fas fa-calendar-alt text-gray-500 mr-2"></i>
+                                <span>Expires: ${new Date(item.expirationDate).toLocaleDateString()}</span>
+                            </div>
+                            ` : ''}
+                            <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                                <div class="flex items-center">
+                                    ${item.tags ? `
+                                    <div class="flex flex-wrap">
+                                        ${item.tags.split(',').map(tag => 
+                                            `<span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded mr-1 mb-1">${tag.trim()}</span>`
+                                        ).join('')}
+                                    </div>
+                                    ` : `
+                                    <span class="text-xs text-gray-500">No tags</span>
+                                    `}
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button class="text-gray-500 hover:text-blue-600 p-1.5 rounded-full hover:bg-blue-50 edit-button" data-id="${item.id}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-gray-500 hover:text-red-600 p-1.5 rounded-full hover:bg-red-50 delete-button" data-id="${item.id}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                itemsGrid.appendChild(itemCard);
+                
+                // Add click event to show details
+                itemCard.addEventListener('click', (e) => {
+                    if (e.target.closest('.edit-button') || e.target.closest('.delete-button')) return;
+                    if (currentView === 'devices') {
+                        showDeviceDetails(item);
+                    } else {
+                        showAssetDetails(item);
+                    }
+                });
+            });
+            
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const itemId = parseInt(button.dataset.id);
+                    if (currentView === 'devices') {
+                        handleEditDevice(itemId);
+                    } else {
+                        handleEditAsset(itemId);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.delete-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const itemId = parseInt(button.dataset.id);
+                    if (currentView === 'devices') {
+                        handleDeleteDevice(itemId);
+                    } else {
+                        handleDeleteAsset(itemId);
+                    }
+                });
+            });
+        }
+        
+        function renderTable(filteredItems) {
+            // Set table headers based on current view
+            if (currentView === 'devices') {
+                tableHeaders.innerHTML = `
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Device Name</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP Address</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contacts</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                `;
+            } else {
+                tableHeaders.innerHTML = `
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asset Name</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiration</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                `;
+            }
+            
+            itemsTableBody.innerHTML = '';
+            filteredItems.forEach(item => {
+                const statusClass = item.status === 'Active' ? 'bg-green-100 text-green-800' : 
+                                  item.status === 'Inactive' ? 'bg-gray-100 text-gray-800' : 
+                                  item.status === 'Maintenance' ? 'bg-yellow-100 text-yellow-800' :
+                                  'bg-red-100 text-red-800';
+                
+                if (currentView === 'devices') {
+                    const primaryContactCount = item.primaryContacts ? item.primaryContacts.length : 0;
+                    const secondaryContactCount = item.secondaryContacts ? item.secondaryContacts.length : 0;
+                    const totalContacts = primaryContactCount + secondaryContactCount;
+                    
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-gray-50 cursor-pointer";
+                    row.dataset.id = item.id;
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="font-medium text-gray-900">${item.name}</div>
+                            <div class="text-sm text-gray-500">${item.model || ''}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-gray-900">${item.ip}</div>
+                            ${item.location ? `<div class="text-sm text-gray-500">${item.location}</div>` : ''}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-gray-900">${item.type}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full ${statusClass}">
+                                ${item.status}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm ${totalContacts > 0 ? 'text-blue-600' : 'text-gray-400'}">
+                                ${totalContacts > 0 ? `👤 ${totalContacts}` : 'No contacts'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button class="text-blue-600 hover:text-blue-900 mr-3 edit-button" data-id="${item.id}">Edit</button>
+                            <button class="text-red-600 hover:text-red-900 delete-button" data-id="${item.id}">Delete</button>
+                        </td>
+                    `;
+                    itemsTableBody.appendChild(row);
+                } else {
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-gray-50 cursor-pointer";
+                    row.dataset.id = item.id;
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="font-medium text-gray-900">${item.name}</div>
+                            <div class="text-sm text-gray-500">${item.vendor || ''}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-gray-900">${item.type}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full ${statusClass}">
+                                ${item.status}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            ${item.expirationDate ? `<div class="text-gray-900">${new Date(item.expirationDate).toLocaleDateString()}</div>` : 'N/A'}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button class="text-blue-600 hover:text-blue-900 mr-3 edit-button" data-id="${item.id}">Edit</button>
+                            <button class="text-red-600 hover:text-red-900 delete-button" data-id="${item.id}">Delete</button>
+                        </td>
+                    `;
+                    itemsTableBody.appendChild(row);
+                }
+                
+                // Add click event to show details
+                row.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'BUTTON') return;
+                    if (currentView === 'devices') {
+                        showDeviceDetails(item);
+                    } else {
+                        showAssetDetails(item);
+                    }
+                });
+            });
+            
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const itemId = parseInt(button.dataset.id);
+                    if (currentView === 'devices') {
+                        handleEditDevice(itemId);
+                    } else {
+                        handleEditAsset(itemId);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.delete-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const itemId = parseInt(button.dataset.id);
+                    if (currentView === 'devices') {
+                        handleDeleteDevice(itemId);
+                    } else {
+                        handleDeleteAsset(itemId);
+                    }
+                });
+            });
+        }
+        
+        function renderMaintenanceSchedule() {
+            // Filter maintenance tasks due within the next 30 days
+            const today = new Date();
+            const thirtyDaysFromNow = new Date();
+            thirtyDaysFromNow.setDate(today.getDate() + 30);
+            
+            const upcomingTasks = maintenanceTasks.filter(task => {
+                const dueDate = new Date(task.dueDate);
+                return dueDate >= today && dueDate <= thirtyDaysFromNow;
+            });
+            
+            // Sort by due date
+            upcomingTasks.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+            
+            // Render upcoming tasks
+            maintenanceTableBody.innerHTML = '';
+            if (upcomingTasks.length === 0) {
+                maintenanceTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            No upcoming maintenance tasks in the next 30 days.
+                        </td>
+                    </tr>
+                `;
+            } else {
+                upcomingTasks.forEach(task => {
+                    const dueDate = new Date(task.dueDate);
+                    const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                    
+                    let priorityClass = '';
+                    let priorityText = '';
+                    if (task.priority === 'High' || task.priority === 'Critical' || daysUntilDue <= 7) {
+                        priorityClass = 'priority-high';
+                        priorityText = 'High';
+                    } else if (task.priority === 'Medium' || daysUntilDue <= 14) {
+                        priorityClass = 'priority-medium';
+                        priorityText = 'Medium';
+                    } else {
+                        priorityClass = 'priority-low';
+                        priorityText = 'Low';
+                    }
+                    
+                    const statusClass = task.status === 'Scheduled' ? 'status-scheduled' : 
+                                      task.status === 'In Progress' ? 'status-maintenance' : 
+                                      task.status === 'Completed' ? 'status-completed' : 
+                                      task.status === 'Overdue' ? 'status-overdue' : 
+                                      'status-inactive';
+                    
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-gray-50 cursor-pointer";
+                    row.dataset.id = task.id;
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="font-medium text-gray-900">${task.deviceName}</div>
+                            <div class="text-sm text-gray-500">${devices.find(d => d.id === task.deviceId)?.type || 'Device'}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="font-medium">${task.name}</div>
+                            <div class="text-sm text-gray-500">${task.description || ''}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-gray-900">${dueDate.toLocaleDateString()}</div>
+                            <div class="text-sm ${daysUntilDue <= 7 ? 'text-red-600' : 'text-gray-500'}">
+                                ${daysUntilDue <= 0 ? 'Today' : `${daysUntilDue} day${daysUntilDue !== 1 ? 's' : ''}`}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="status-badge ${statusClass}">
+                                ${task.status}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="font-medium ${priorityClass}">
+                                ${priorityText}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button class="text-blue-600 hover:text-blue-900 mr-3 edit-task-button" data-id="${task.id}">Edit</button>
+                            <button class="text-red-600 hover:text-red-900 delete-task-button" data-id="${task.id}">Delete</button>
+                        </td>
+                    `;
+                    maintenanceTableBody.appendChild(row);
+                });
+            }
+            
+            // Render maintenance history (completed tasks)
+            const completedTasks = maintenanceTasks.filter(task => task.status === 'Completed');
+            maintenanceHistoryTableBody.innerHTML = '';
+            if (completedTasks.length === 0) {
+                maintenanceHistoryTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            No completed maintenance tasks.
+                        </td>
+                    </tr>
+                `;
+            } else {
+                completedTasks.forEach(task => {
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-gray-50";
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="font-medium text-gray-900">${task.deviceName}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="font-medium">${task.name}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-gray-900">${new Date(task.completedDate).toLocaleDateString()}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-gray-900">${task.assignedTo || 'N/A'}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-gray-900">$${task.cost ? task.cost.toFixed(2) : '0.00'}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button class="text-blue-600 hover:text-blue-900 view-task-button" data-id="${task.id}">View</button>
+                        </td>
+                    `;
+                    maintenanceHistoryTableBody.appendChild(row);
+                });
+            }
+            
+            // Show maintenance modal
+            maintenanceModal.classList.remove('hidden');
+            maintenanceModal.classList.add('flex', 'animate-fade-in');
+        }
+        
+        function renderUsers() {
+            usersTableBody.innerHTML = '';
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-gray-50";
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="font-medium text-gray-900">${user.username}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full ${
+                            user.role === 'admin' ? 'bg-blue-100 text-blue-800' : 
+                            user.role === 'user' ? 'bg-green-100 text-green-800' : 
+                            'bg-gray-100 text-gray-800'
+                        }">
+                            ${user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-gray-900">${user.devices ? user.devices.length : 0}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-gray-900">${user.assets ? user.assets.length : 0}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button class="text-blue-600 hover:text-blue-900 mr-3 edit-user-button" data-id="${user.id}">Edit</button>
+                        ${user.username !== 'admin' ? `<button class="text-red-600 hover:text-red-900 delete-user-button" data-id="${user.id}">Delete</button>` : ''}
+                    </td>
+                `;
+                usersTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-user-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const userId = parseInt(button.dataset.id);
+                    handleEditUser(userId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-user-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const userId = parseInt(button.dataset.id);
+                    handleDeleteUser(userId);
+                });
+            });
+            
+            // Show users modal
+            usersModal.classList.remove('hidden');
+            usersModal.classList.add('flex', 'animate-fade-in');
+        }
+        
+        function showDeviceDetails(device) {
+            detailTitle.textContent = device.name;
+            // Basic Info Tab
+            detailBasicTab.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Device Name</h3>
+                        <p class="font-medium">${device.name}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Model</h3>
+                        <p>${device.model || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">IP Address</h3>
+                        <p>${device.ip}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">MAC Address</h3>
+                        <p>${device.mac || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Device Type</h3>
+                        <p>${device.type}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Status</h3>
+                        <span class="status-badge ${
+                            device.status === 'Active' ? 'status-active' : 
+                            device.status === 'Inactive' ? 'status-inactive' : 
+                            device.status === 'Maintenance' ? 'status-maintenance' :
+                            'status-retired'
+                        }">
+                            ${device.status}
+                        </span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Category</h3>
+                        <p>${device.category || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Location</h3>
+                        <p>${device.location || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Last Updated</h3>
+                        <p>${device.lastUpdated}</p>
+                    </div>
+                </div>
+            `;
+            // Credentials Tab
+            detailCredsTab.innerHTML = `
+                ${device.username ? `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">Username/Email</h3>
+                            <p>${device.username}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">Password</h3>
+                            <p>
+                                <span class="password-display" data-password="${device.password}">••••••••</span>
+                                <button onclick="togglePasswordDisplay(this)" class="ml-2 text-blue-600 text-sm hover:underline">Show</button>
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">Port</h3>
+                            <p>${device.port || 'N/A'}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">Management URL</h3>
+                            <p>${device.url ? `<a href="${device.url}" target="_blank" class="text-blue-600 hover:underline">${device.url}</a>` : 'N/A'}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">Access Method</h3>
+                            <p>${device.access || 'N/A'}</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">Notes</h3>
+                            <p>${device.notes || 'N/A'}</p>
+                        </div>
+                    </div>
+                ` : `
+                    <div class="text-center py-8">
+                        <div class="mx-auto bg-gray-100 rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4">
+                            <i class="fas fa-lock text-gray-400 text-2xl"></i>
+                        </div>
+                        <p class="text-gray-500">No credentials stored for this device.</p>
+                    </div>
+                `}
+            `;
+            // Contacts Tab
+            let contactsHtml = '';
+            if (device.primaryContacts && device.primaryContacts.length > 0) {
+                contactsHtml += `<h3 class="font-medium text-gray-900 mb-4">Primary Contacts</h3>`;
+                device.primaryContacts.forEach(contact => {
+                    contactsHtml += `
+                        <div class="border p-4 rounded-lg mb-4">
+                            <div class="flex justify-between">
+                                <h4 class="font-medium">${contact.name}</h4>
+                                ${contact.role ? `<span class="text-sm text-gray-600">${contact.role}</span>` : ''}
+                            </div>
+                            <div class="mt-3 space-y-2">
+                                ${contact.email ? `
+                                <div class="flex items-center text-sm">
+                                    <i class="fas fa-envelope text-gray-500 mr-2"></i>
+                                    <a href="mailto:${contact.email}" class="text-blue-600 hover:underline">${contact.email}</a>
+                                </div>
+                                ` : ''}
+                                ${contact.phone ? `
+                                <div class="flex items-center text-sm">
+                                    <i class="fas fa-phone text-gray-500 mr-2"></i>
+                                    <a href="tel:${contact.phone.replace(/[^0-9+]/g, '')}" class="text-blue-600 hover:underline">${contact.phone}</a>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            if (device.secondaryContacts && device.secondaryContacts.length > 0) {
+                contactsHtml += `<h3 class="font-medium text-gray-900 mb-4 mt-6">Secondary Contacts</h3>`;
+                device.secondaryContacts.forEach(contact => {
+                    contactsHtml += `
+                        <div class="border p-4 rounded-lg mb-4">
+                            <div class="flex justify-between">
+                                <h4 class="font-medium">${contact.name}</h4>
+                                ${contact.role ? `<span class="text-sm text-gray-600">${contact.role}</span>` : ''}
+                            </div>
+                            <div class="mt-3 space-y-2">
+                                ${contact.email ? `
+                                <div class="flex items-center text-sm">
+                                    <i class="fas fa-envelope text-gray-500 mr-2"></i>
+                                    <a href="mailto:${contact.email}" class="text-blue-600 hover:underline">${contact.email}</a>
+                                </div>
+                                ` : ''}
+                                ${contact.phone ? `
+                                <div class="flex items-center text-sm">
+                                    <i class="fas fa-phone text-gray-500 mr-2"></i>
+                                    <a href="tel:${contact.phone.replace(/[^0-9+]/g, '')}" class="text-blue-600 hover:underline">${contact.phone}</a>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            if (!contactsHtml) {
+                contactsHtml = `
+                    <div class="text-center py-8">
+                        <div class="mx-auto bg-gray-100 rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4">
+                            <i class="fas fa-address-book text-gray-400 text-2xl"></i>
+                        </div>
+                        <p class="text-gray-500">No contacts stored for this device.</p>
+                    </div>
+                `;
+            }
+            detailContactsTab.innerHTML = contactsHtml;
+            // Maintenance Tab
+            if (currentView === 'devices') {
+                detailMaintenanceTab.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">Last Maintenance Date</h3>
+                            <p>${device.lastMaintenance || 'N/A'}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">Next Maintenance Date</h3>
+                            <p>${device.nextMaintenance || 'N/A'}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">Maintenance Interval</h3>
+                            <p>${device.maintenanceInterval ? `${device.maintenanceInterval} days` : 'N/A'}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">Maintenance Status</h3>
+                            <span class="status-badge ${
+                                device.maintenanceStatus === 'Scheduled' ? 'status-scheduled' : 
+                                device.maintenanceStatus === 'In Progress' ? 'status-maintenance' : 
+                                device.maintenanceStatus === 'Completed' ? 'status-completed' : 
+                                device.maintenanceStatus === 'Overdue' ? 'status-overdue' : 
+                                'status-inactive'
+                            }">
+                                ${device.maintenanceStatus || 'N/A'}
+                            </span>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">Maintenance Priority</h3>
+                            <span class="font-medium ${
+                                device.maintenancePriority === 'High' || device.maintenancePriority === 'Critical' ? 'priority-high' : 
+                                device.maintenancePriority === 'Medium' ? 'priority-medium' : 
+                                'priority-low'
+                            }">
+                                ${device.maintenancePriority || 'N/A'}
+                            </span>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">Estimated Cost</h3>
+                            <p>$${device.maintenanceCost ? device.maintenanceCost.toFixed(2) : '0.00'}</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">Maintenance Notes</h3>
+                            <p>${device.maintenanceNotes || 'N/A'}</p>
+                        </div>
+                    </div>
+                    ${device.spareParts && device.spareParts.length > 0 ? `
+                    <div class="mb-6">
+                        <h3 class="font-medium text-gray-900 mb-4">Spare Parts Inventory</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${device.spareParts.map(part => `
+                                <div class="border p-3 rounded-lg">
+                                    <div class="font-medium">${part.name}</div>
+                                    <div class="text-sm text-gray-600">${part.partNumber || 'No part number'}</div>
+                                    <div class="flex justify-between mt-2">
+                                        <span class="text-sm">Qty: ${part.quantity || 'N/A'}</span>
+                                        <span class="text-sm">${part.supplier || 'N/A'}</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : `
+                    <div class="mb-6">
+                        <h3 class="font-medium text-gray-900 mb-4">Spare Parts Inventory</h3>
+                        <p class="text-gray-500">No spare parts recorded for this device.</p>
+                    </div>
+                    `}
+                `;
+            } else {
+                detailMaintenanceTab.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="mx-auto bg-gray-100 rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4">
+                            <i class="fas fa-tools text-gray-400 text-2xl"></i>
+                        </div>
+                        <p class="text-gray-500">Maintenance information not applicable for digital assets.</p>
+                    </div>
+                `;
+            }
+            // More Info Tab
+            let moreInfoHtml = '';
+            if (device.notes) {
+                moreInfoHtml += `
+                    <div class="mb-6">
+                        <h3 class="font-medium text-gray-900 mb-2">Notes</h3>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="whitespace-pre-line">${device.notes}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            moreInfoHtml += `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Purchase Date</h3>
+                        <p>${device.purchaseDate || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Warranty Expiry</h3>
+                        <p>${device.warrantyExpiry || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Vendor</h3>
+                        <p>${device.vendor || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Serial Number</h3>
+                        <p>${device.serial || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Version</h3>
+                        <p>${device.version || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Tags</h3>
+                        <p>${device.tags || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Support Contact</h3>
+                        <p>${device.supportContact || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Support Phone</h3>
+                        <p>${device.supportPhone || 'N/A'}</p>
+                    </div>
+                </div>
+            `;
+            detailMoreTab.innerHTML = moreInfoHtml;
+            // Reset tabs to show basic info first
+            document.querySelectorAll('#detail-modal .tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('#detail-modal .tab-button[data-tab="detail-basic"]').classList.add('active');
+            document.querySelectorAll('#detail-modal .tab-content').forEach(tab => tab.classList.add('hidden'));
+            detailBasicTab.classList.remove('hidden');
+            detailModal.classList.remove('hidden');
+            detailModal.classList.add('flex', 'animate-fade-in');
+        }
+        
+        function showAssetDetails(asset) {
+            detailTitle.textContent = asset.name;
+            // Basic Info Tab
+            detailBasicTab.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Asset Name</h3>
+                        <p class="font-medium">${asset.name}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Vendor</h3>
+                        <p>${asset.vendor || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Asset Type</h3>
+                        <p>${asset.type}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Status</h3>
+                        <span class="status-badge ${
+                            asset.status === 'Active' ? 'status-active' : 
+                            asset.status === 'Inactive' ? 'status-inactive' : 
+                            asset.status === 'Expired' ? 'status-retired' :
+                            'status-maintenance'
+                        }">
+                            ${asset.status}
+                        </span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Category</h3>
+                        <p>${asset.category || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Location</h3>
+                        <p>${asset.location || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Last Updated</h3>
+                        <p>${asset.lastUpdated}</p>
+                    </div>
+                </div>
+            `;
+            // Credentials Tab
+            detailCredsTab.innerHTML = `
+                ${asset.username ? `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">Username/Email</h3>
+                            <p>${asset.username}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">Password</h3>
+                            <p>
+                                <span class="password-display" data-password="${asset.password}">••••••••</span>
+                                <button onclick="togglePasswordDisplay(this)" class="ml-2 text-blue-600 text-sm hover:underline">Show</button>
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">URL/Portal</h3>
+                            <p>${asset.url ? `<a href="${asset.url}" target="_blank" class="text-blue-600 hover:underline">${asset.url}</a>` : 'N/A'}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">Account Type</h3>
+                            <p>${asset.accountType || 'N/A'}</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <h3 class="text-sm font-medium text-gray-500 mb-1">Notes</h3>
+                            <p>${asset.notes || 'N/A'}</p>
+                        </div>
+                    </div>
+                ` : `
+                    <div class="text-center py-8">
+                        <div class="mx-auto bg-gray-100 rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4">
+                            <i class="fas fa-lock text-gray-400 text-2xl"></i>
+                        </div>
+                        <p class="text-gray-500">No credentials stored for this asset.</p>
+                    </div>
+                `}
+            `;
+            // Contacts Tab
+            let contactsHtml = '';
+            if (asset.primaryContacts && asset.primaryContacts.length > 0) {
+                contactsHtml += `<h3 class="font-medium text-gray-900 mb-4">Primary Contacts</h3>`;
+                asset.primaryContacts.forEach(contact => {
+                    contactsHtml += `
+                        <div class="border p-4 rounded-lg mb-4">
+                            <div class="flex justify-between">
+                                <h4 class="font-medium">${contact.name}</h4>
+                                ${contact.role ? `<span class="text-sm text-gray-600">${contact.role}</span>` : ''}
+                            </div>
+                            <div class="mt-3 space-y-2">
+                                ${contact.email ? `
+                                <div class="flex items-center text-sm">
+                                    <i class="fas fa-envelope text-gray-500 mr-2"></i>
+                                    <a href="mailto:${contact.email}" class="text-blue-600 hover:underline">${contact.email}</a>
+                                </div>
+                                ` : ''}
+                                ${contact.phone ? `
+                                <div class="flex items-center text-sm">
+                                    <i class="fas fa-phone text-gray-500 mr-2"></i>
+                                    <a href="tel:${contact.phone.replace(/[^0-9+]/g, '')}" class="text-blue-600 hover:underline">${contact.phone}</a>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            if (asset.secondaryContacts && asset.secondaryContacts.length > 0) {
+                contactsHtml += `<h3 class="font-medium text-gray-900 mb-4 mt-6">Secondary Contacts</h3>`;
+                asset.secondaryContacts.forEach(contact => {
+                    contactsHtml += `
+                        <div class="border p-4 rounded-lg mb-4">
+                            <div class="flex justify-between">
+                                <h4 class="font-medium">${contact.name}</h4>
+                                ${contact.role ? `<span class="text-sm text-gray-600">${contact.role}</span>` : ''}
+                            </div>
+                            <div class="mt-3 space-y-2">
+                                ${contact.email ? `
+                                <div class="flex items-center text-sm">
+                                    <i class="fas fa-envelope text-gray-500 mr-2"></i>
+                                    <a href="mailto:${contact.email}" class="text-blue-600 hover:underline">${contact.email}</a>
+                                </div>
+                                ` : ''}
+                                ${contact.phone ? `
+                                <div class="flex items-center text-sm">
+                                    <i class="fas fa-phone text-gray-500 mr-2"></i>
+                                    <a href="tel:${contact.phone.replace(/[^0-9+]/g, '')}" class="text-blue-600 hover:underline">${contact.phone}</a>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            if (!contactsHtml) {
+                contactsHtml = `
+                    <div class="text-center py-8">
+                        <div class="mx-auto bg-gray-100 rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4">
+                            <i class="fas fa-address-book text-gray-400 text-2xl"></i>
+                        </div>
+                        <p class="text-gray-500">No contacts stored for this asset.</p>
+                    </div>
+                `;
+            }
+            detailContactsTab.innerHTML = contactsHtml;
+            // Maintenance Tab
+            detailMaintenanceTab.innerHTML = `
+                <div class="text-center py-8">
+                    <div class="mx-auto bg-gray-100 rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4">
+                        <i class="fas fa-tools text-gray-400 text-2xl"></i>
+                    </div>
+                    <p class="text-gray-500">Maintenance information not applicable for digital assets.</p>
+                </div>
+            `;
+            // More Info Tab
+            let moreInfoHtml = '';
+            if (asset.description) {
+                moreInfoHtml += `
+                    <div class="mb-6">
+                        <h3 class="font-medium text-gray-900 mb-2">Description</h3>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="whitespace-pre-line">${asset.description}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            moreInfoHtml += `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Version</h3>
+                        <p>${asset.version || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Tags</h3>
+                        <p>${asset.tags || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Support Contact</h3>
+                        <p>${asset.supportContact || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Support Phone</h3>
+                        <p>${asset.supportPhone || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Purchase Date</h3>
+                        <p>${asset.purchaseDate || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Expiration Date</h3>
+                        <p>${asset.expirationDate || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Number of Seats</h3>
+                        <p>${asset.seats || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Renewal Reminder</h3>
+                        <p>${asset.renewalReminder ? `${asset.renewalReminder} days` : 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">License Key</h3>
+                        <p>${asset.licenseKey || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">License Type</h3>
+                        <p>${asset.licenseType || 'N/A'}</p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Licensing Notes</h3>
+                        <p>${asset.licenseNotes || 'N/A'}</p>
+                    </div>
+                </div>
+            `;
+            detailMoreTab.innerHTML = moreInfoHtml;
+            // Reset tabs to show basic info first
+            document.querySelectorAll('#detail-modal .tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('#detail-modal .tab-button[data-tab="detail-basic"]').classList.add('active');
+            document.querySelectorAll('#detail-modal .tab-content').forEach(tab => tab.classList.add('hidden'));
+            detailBasicTab.classList.remove('hidden');
+            detailModal.classList.remove('hidden');
+            detailModal.classList.add('flex', 'animate-fade-in');
+        }
+        
+        function togglePasswordDisplay(button) {
+            const passwordDisplay = button.previousElementSibling;
+            if (passwordDisplay.textContent === '••••••••') {
+                passwordDisplay.textContent = passwordDisplay.dataset.password;
+                button.textContent = 'Hide';
+            } else {
+                passwordDisplay.textContent = '••••••••';
+                button.textContent = 'Show';
+            }
+        }
+        
+        function handleAddDevice() {
+            deviceModalTitle.textContent = 'Add New Device';
+            deviceIdInput.value = '';
+            deviceUniqueCodeInput.value = generateUniqueCode('DEV');
+            deviceForm.reset();
+            // Clear contacts containers
+            primaryContactsContainer.innerHTML = '';
+            secondaryContactsContainer.innerHTML = '';
+            // Clear spare parts container
+            sparePartsContainer.innerHTML = '';
+            // Add one spare part fieldset by default
+            const fieldset = createSparePartFieldset();
+            sparePartsContainer.appendChild(fieldset);
+            // Reset tabs to show basic info first
+            document.querySelectorAll('#device-modal .tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('#device-modal .tab-button[data-tab="basic-info"]').classList.add('active');
+            document.querySelectorAll('#device-modal .tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById('basic-info-tab').classList.remove('hidden');
+            deviceModal.classList.remove('hidden');
+            deviceModal.classList.add('flex', 'animate-fade-in');
+        }
+        
+        function handleEditDevice(deviceId) {
+            const device = devices.find(d => d.id === deviceId);
+            if (!device) return;
+            deviceModalTitle.textContent = 'Edit Device';
+            deviceIdInput.value = device.id;
+            deviceUniqueCodeInput.value = device.uniqueCode || generateUniqueCode('DEV');
+            deviceNameInput.value = device.name;
+            deviceModelInput.value = device.model || '';
+            deviceIpInput.value = device.ip;
+            deviceMacInput.value = device.mac || '';
+            deviceTypeInput.value = device.type;
+            deviceStatusInput.value = device.status;
+            deviceCategoryInput.value = device.category || '';
+            deviceLocationInput.value = device.location || '';
+            deviceUsernameInput.value = device.username || '';
+            devicePasswordInput.value = device.password || '';
+            devicePortInput.value = device.port || '';
+            deviceUrlInput.value = device.url || '';
+            deviceAccessInput.value = device.access || '';
+            deviceCredsNotesInput.value = device.notes || '';
+            deviceLastMaintenanceInput.value = device.lastMaintenance || '';
+            deviceNextMaintenanceInput.value = device.nextMaintenance || '';
+            deviceMaintenanceIntervalInput.value = device.maintenanceInterval || '';
+            deviceMaintenanceStatusInput.value = device.maintenanceStatus || '';
+            deviceMaintenancePriorityInput.value = device.maintenancePriority || '';
+            deviceMaintenanceCostInput.value = device.maintenanceCost || '';
+            deviceMaintenanceNotesInput.value = device.maintenanceNotes || '';
+            deviceVersionInput.value = device.version || '';
+            deviceTagsInput.value = device.tags || '';
+            deviceSupportContactInput.value = device.supportContact || '';
+            deviceSupportPhoneInput.value = device.supportPhone || '';
+            devicePurchaseDateInput.value = device.purchaseDate || '';
+            deviceWarrantyInput.value = device.warrantyExpiry || '';
+            deviceVendorInput.value = device.vendor || '';
+            deviceSerialInput.value = device.serial || '';
+            deviceNotesInput.value = device.notes || '';
+            // Clear and repopulate contacts
+            primaryContactsContainer.innerHTML = '';
+            if (device.primaryContacts) {
+                device.primaryContacts.forEach(contact => {
+                    const fieldset = createContactFieldset('primary', contact);
+                    primaryContactsContainer.appendChild(fieldset);
+                });
+            }
+            secondaryContactsContainer.innerHTML = '';
+            if (device.secondaryContacts) {
+                device.secondaryContacts.forEach(contact => {
+                    const fieldset = createContactFieldset('secondary', contact);
+                    secondaryContactsContainer.appendChild(fieldset);
+                });
+            }
+            // Clear and repopulate spare parts
+            sparePartsContainer.innerHTML = '';
+            if (device.spareParts && device.spareParts.length > 0) {
+                device.spareParts.forEach(part => {
+                    const fieldset = createSparePartFieldset(part);
+                    sparePartsContainer.appendChild(fieldset);
+                });
+            } else {
+                // Add one empty spare part fieldset if none exist
+                const fieldset = createSparePartFieldset();
+                sparePartsContainer.appendChild(fieldset);
+            }
+            // Reset tabs to show basic info first
+            document.querySelectorAll('#device-modal .tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('#device-modal .tab-button[data-tab="basic-info"]').classList.add('active');
+            document.querySelectorAll('#device-modal .tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById('basic-info-tab').classList.remove('hidden');
+            deviceModal.classList.remove('hidden');
+            deviceModal.classList.add('flex', 'animate-fade-in');
+        }
+        
+        function handleDeleteDevice(deviceId) {
+            const device = devices.find(d => d.id === deviceId);
+            if (!device) return;
+            confirmMessage.textContent = `Are you sure you want to delete the device "${device.name}" (${device.ip})? This action cannot be undone.`;
+            confirmDeleteButton.dataset.id = `device-${deviceId}`;
+            confirmModal.classList.remove('hidden');
+            confirmModal.classList.add('flex', 'animate-fade-in');
+        }
+        
+        function handleAddAsset() {
+            deviceModalTitle.textContent = 'Add New Digital Asset';
+            deviceIdInput.value = '';
+            deviceUniqueCodeInput.value = generateUniqueCode('AST');
+            deviceForm.reset();
+            // Clear contacts containers
+            primaryContactsContainer.innerHTML = '';
+            secondaryContactsContainer.innerHTML = '';
+            // Clear spare parts container
+            sparePartsContainer.innerHTML = '';
+            // Reset tabs to show basic info first
+            document.querySelectorAll('#device-modal .tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('#device-modal .tab-button[data-tab="basic-info"]').classList.add('active');
+            document.querySelectorAll('#device-modal .tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById('basic-info-tab').classList.remove('hidden');
+            deviceModal.classList.remove('hidden');
+            deviceModal.classList.add('flex', 'animate-fade-in');
+        }
+        
+        function handleEditAsset(assetId) {
+            const asset = assets.find(a => a.id === assetId);
+            if (!asset) return;
+            deviceModalTitle.textContent = 'Edit Digital Asset';
+            deviceIdInput.value = asset.id;
+            deviceUniqueCodeInput.value = asset.uniqueCode || generateUniqueCode('AST');
+            deviceNameInput.value = asset.name;
+            deviceModelInput.value = asset.vendor || '';
+            deviceIpInput.value = '';
+            deviceMacInput.value = '';
+            deviceTypeInput.value = asset.type;
+            deviceStatusInput.value = asset.status;
+            deviceCategoryInput.value = asset.category || '';
+            deviceLocationInput.value = asset.location || '';
+            deviceUsernameInput.value = asset.username || '';
+            devicePasswordInput.value = asset.password || '';
+            devicePortInput.value = '';
+            deviceUrlInput.value = asset.url || '';
+            deviceAccessInput.value = '';
+            deviceCredsNotesInput.value = asset.notes || '';
+            deviceLastMaintenanceInput.value = '';
+            deviceNextMaintenanceInput.value = '';
+            deviceMaintenanceIntervalInput.value = '';
+            deviceMaintenanceStatusInput.value = '';
+            deviceMaintenancePriorityInput.value = '';
+            deviceMaintenanceCostInput.value = '';
+            deviceMaintenanceNotesInput.value = '';
+            deviceVersionInput.value = asset.version || '';
+            deviceTagsInput.value = asset.tags || '';
+            deviceSupportContactInput.value = asset.supportContact || '';
+            deviceSupportPhoneInput.value = asset.supportPhone || '';
+            devicePurchaseDateInput.value = asset.purchaseDate || '';
+            deviceWarrantyInput.value = '';
+            deviceVendorInput.value = asset.vendor || '';
+            deviceSerialInput.value = '';
+            deviceNotesInput.value = asset.description || '';
+            // Clear and repopulate contacts
+            primaryContactsContainer.innerHTML = '';
+            if (asset.primaryContacts) {
+                asset.primaryContacts.forEach(contact => {
+                    const fieldset = createContactFieldset('primary', contact);
+                    primaryContactsContainer.appendChild(fieldset);
+                });
+            }
+            secondaryContactsContainer.innerHTML = '';
+            if (asset.secondaryContacts) {
+                asset.secondaryContacts.forEach(contact => {
+                    const fieldset = createContactFieldset('secondary', contact);
+                    secondaryContactsContainer.appendChild(fieldset);
+                });
+            }
+            // Clear spare parts container (not applicable for assets)
+            sparePartsContainer.innerHTML = '';
+            // Reset tabs to show basic info first
+            document.querySelectorAll('#device-modal .tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('#device-modal .tab-button[data-tab="basic-info"]').classList.add('active');
+            document.querySelectorAll('#device-modal .tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById('basic-info-tab').classList.remove('hidden');
+            deviceModal.classList.remove('hidden');
+            deviceModal.classList.add('flex', 'animate-fade-in');
+        }
+        
+        function handleDeleteAsset(assetId) {
+            const asset = assets.find(a => a.id === assetId);
+            if (!asset) return;
+            confirmMessage.textContent = `Are you sure you want to delete the asset "${asset.name}"? This action cannot be undone.`;
+            confirmDeleteButton.dataset.id = `asset-${assetId}`;
+            confirmModal.classList.remove('hidden');
+            confirmModal.classList.add('flex', 'animate-fade-in');
+        }
+        
+        function closeModal() {
+            deviceModal.classList.add('hidden');
+            deviceModal.classList.remove('flex', 'animate-fade-in');
+            detailModal.classList.add('hidden');
+            detailModal.classList.remove('flex', 'animate-fade-in');
+            confirmModal.classList.add('hidden');
+            confirmModal.classList.remove('flex', 'animate-fade-in');
+            maintenanceModal.classList.add('hidden');
+            maintenanceModal.classList.remove('flex', 'animate-fade-in');
+            maintenanceTaskModal.classList.add('hidden');
+            maintenanceTaskModal.classList.remove('flex', 'animate-fade-in');
+            usersModal.classList.add('hidden');
+            usersModal.classList.remove('flex', 'animate-fade-in');
+            userModal.classList.add('hidden');
+            userModal.classList.remove('flex', 'animate-fade-in');
+        }
+        
+        function showMaintenanceSchedule() {
+            currentView = 'maintenance';
+            sectionTitle.textContent = 'Maintenance Schedule';
+            itemCount.textContent = `${maintenanceTasks.length} task${maintenanceTasks.length !== 1 ? 's' : ''}`;
+            
+            // Hide all views
+            itemsGrid.classList.add('hidden');
+            itemsTableContainer.classList.add('hidden');
+            noItemsMessage.classList.add('hidden');
+            
+            // Show maintenance modal
+            renderMaintenanceSchedule();
+            maintenanceModal.classList.remove('hidden');
+            maintenanceModal.classList.add('flex', 'animate-fade-in');
+        }
+        
+        function handleAddMaintenanceTask() {
+            maintenanceTaskModalTitle.textContent = 'Add Maintenance Task';
+            taskIdInput.value = '';
+            taskDeviceIdInput.value = '';
+            maintenanceTaskForm.reset();
+            // Populate device dropdown
+            taskDeviceSelect.innerHTML = '<option value="">Select a device</option>';
+            devices.forEach(device => {
+                const option = document.createElement('option');
+                option.value = device.id;
+                option.textContent = `${device.name} (${device.ip})`;
+                taskDeviceSelect.appendChild(option);
+            });
+            // Clear spare parts container
+            taskSparePartsContainer.innerHTML = '';
+            maintenanceTaskModal.classList.remove('hidden');
+            maintenanceTaskModal.classList.add('flex', 'animate-fade-in');
+        }
+        
+        function handleEditMaintenanceTask(taskId) {
+            const task = maintenanceTasks.find(t => t.id === taskId);
+            if (!task) return;
+            maintenanceTaskModalTitle.textContent = 'Edit Maintenance Task';
+            taskIdInput.value = task.id;
+            taskDeviceSelect.innerHTML = '<option value="">Select a device</option>';
+            devices.forEach(device => {
+                const option = document.createElement('option');
+                option.value = device.id;
+                option.textContent = `${device.name} (${device.ip})`;
+                option.selected = device.id === task.deviceId;
+                taskDeviceSelect.appendChild(option);
+            });
+            taskNameInput.value = task.name;
+            taskDueDateInput.value = task.dueDate;
+            taskPriorityInput.value = task.priority;
+            taskStatusInput.value = task.status;
+            taskDescriptionInput.value = task.description || '';
+            taskAssignedToInput.value = task.assignedTo || '';
+            taskCostInput.value = task.cost || '';
+            taskDurationInput.value = task.duration || '';
+            // Clear and repopulate spare parts
+            taskSparePartsContainer.innerHTML = '';
+            if (task.spareParts && task.spareParts.length > 0) {
+                task.spareParts.forEach(part => {
+                    const fieldset = createSparePartFieldset(part);
+                    taskSparePartsContainer.appendChild(fieldset);
+                });
+            }
+            maintenanceTaskModal.classList.remove('hidden');
+            maintenanceTaskModal.classList.add('flex', 'animate-fade-in');
+        }
+        
+        function handleDeleteMaintenanceTask(taskId) {
+            const task = maintenanceTasks.find(t => t.id === taskId);
+            if (!task) return;
+            confirmMessage.textContent = `Are you sure you want to delete the maintenance task "${task.name}"? This action cannot be undone.`;
+            confirmDeleteButton.dataset.id = `task-${taskId}`;
+            confirmModal.classList.remove('hidden');
+            confirmModal.classList.add('flex', 'animate-fade-in');
+        }
+        
+        function handleAddUser() {
+            userModalTitle.textContent = 'Add New User';
+            userIdInput.value = '';
+            userUniqueCodeInput.value = generateUniqueCode('USR');
+            userForm.reset();
+            userModal.classList.remove('hidden');
+            userModal.classList.add('flex', 'animate-fade-in');
+        }
+        
+        function handleEditUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            userModalTitle.textContent = 'Edit User';
+            userIdInput.value = user.id;
+            userUniqueCodeInput.value = user.uniqueCode || generateUniqueCode('USR');
+            userUsernameInput.value = user.username;
+            userRoleInput.value = user.role;
+            userPasswordInput.required = false;
+            userConfirmPasswordInput.required = false;
+            userModal.classList.remove('hidden');
+            userModal.classList.add('flex', 'animate-fade-in');
+        }
+        
+        function handleDeleteUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user || user.username === 'admin') return;
+            confirmMessage.textContent = `Are you sure you want to delete the user "${user.username}"? This action cannot be undone.`;
+            confirmDeleteButton.dataset.id = `user-${userId}`;
+            confirmModal.classList.remove('hidden');
+            confirmModal.classList.add('flex', 'animate-fade-in');
+        }
+        
+        function generateUniqueCode(prefix) {
+            const date = new Date();
+            const year = date.getFullYear().toString().substr(2);
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            return `${prefix}-${year}${month}${day}-${random}`;
+        }
+        
+        // --- Authentication Functions ---
+        function login(username, password) {
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                currentUser = username;
+                currentUserSpan.textContent = username;
+                loginScreen.classList.add('hidden');
+                registerScreen.classList.add('hidden');
+                appScreen.classList.remove('hidden');
+                loadUserDevices();
+                return true;
+            }
+            return false;
+        }
+        
+        function register(username, password) {
+            if (users.some(u => u.username === username)) {
+                return false; // Username exists
+            }
+            users.push({
+                id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
+                username,
+                password,
+                role: 'user',
+                uniqueCode: generateUniqueCode('USR'),
+                devices: [],
+                assets: [],
+                maintenanceTasks: []
+            });
+            saveUsers();
+            return true;
+        }
+        
+        function logout() {
+            currentUser = null;
+            devices = [];
+            assets = [];
+            maintenanceTasks = [];
+            appScreen.classList.add('hidden');
+            loginScreen.classList.remove('hidden');
+            loginForm.reset();
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('userPassword');
+        }
+        
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const loggedInUser = localStorage.getItem('currentUser');
+            if (loggedInUser) {
+                if (login(loggedInUser, localStorage.getItem('userPassword'))) {
+                    return;
+                }
+            }
+            loginScreen.classList.remove('hidden');
+        });
+        
+        // Tab switching in modals
+        document.addEventListener('click', (e) => {
+            // Device modal tabs
+            if (e.target.matches('#device-modal .tab-button')) {
+                e.preventDefault();
+                const tab = e.target.dataset.tab;
+                // Update active tab button
+                document.querySelectorAll('#device-modal .tab-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                // Show corresponding tab content
+                document.querySelectorAll('#device-modal .tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                document.getElementById(`${tab}-tab`).classList.remove('hidden');
+            }
+            // Detail modal tabs
+            if (e.target.matches('#detail-modal .tab-button')) {
+                e.preventDefault();
+                const tab = e.target.dataset.tab;
+                // Update active tab button
+                document.querySelectorAll('#detail-modal .tab-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                // Show corresponding tab content
+                document.querySelectorAll('#detail-modal .tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                document.getElementById(`${tab}-tab`).classList.remove('hidden');
+            }
+            // Remove contact buttons
+            if (e.target.classList.contains('remove-contact')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const contactType = e.target.dataset.contactType;
+                const fieldset = e.target.closest('div[data-contact-id]');
+                fieldset.remove();
+            }
+            // Remove spare part buttons
+            if (e.target.classList.contains('remove-spare-part')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const fieldset = e.target.closest('div[data-part-id]');
+                fieldset.remove();
+            }
+            // Navigation
+            if (e.target.id === 'nav-devices') {
+                currentView = 'devices';
+                navDevices.classList.add('bg-blue-50', 'text-blue-700');
+                navDevices.classList.remove('text-gray-600', 'hover:bg-gray-100');
+                navAssets.classList.remove('bg-blue-50', 'text-blue-700');
+                navAssets.classList.add('text-gray-600', 'hover:bg-gray-100');
+                navUsers.classList.remove('bg-blue-50', 'text-blue-700');
+                navUsers.classList.add('text-gray-600', 'hover:bg-gray-100');
+                navMaintenance.classList.remove('bg-blue-50', 'text-blue-700');
+                navMaintenance.classList.add('text-gray-600', 'hover:bg-gray-100');
+                renderItems(devices);
+            }
+            if (e.target.id === 'nav-assets') {
+                currentView = 'assets';
+                navAssets.classList.add('bg-blue-50', 'text-blue-700');
+                navAssets.classList.remove('text-gray-600', 'hover:bg-gray-100');
+                navDevices.classList.remove('bg-blue-50', 'text-blue-700');
+                navDevices.classList.add('text-gray-600', 'hover:bg-gray-100');
+                navUsers.classList.remove('bg-blue-50', 'text-blue-700');
+                navUsers.classList.add('text-gray-600', 'hover:bg-gray-100');
+                navMaintenance.classList.remove('bg-blue-50', 'text-blue-700');
+                navMaintenance.classList.add('text-gray-600', 'hover:bg-gray-100');
+                renderItems(assets);
+            }
+            if (e.target.id === 'nav-users') {
+                renderUsers();
+            }
+            if (e.target.id === 'nav-maintenance') {
+                showMaintenanceSchedule();
+            }
+            // View toggle
+            if (e.target.id === 'grid-view') {
+                displayMode = 'grid';
+                gridViewBtn.classList.add('active');
+                tableViewBtn.classList.remove('active');
+                renderItems();
+            }
+            if (e.target.id === 'table-view') {
+                displayMode = 'table';
+                tableViewBtn.classList.add('active');
+                gridViewBtn.classList.remove('active');
+                renderItems();
+            }
+            // Mobile menu toggle
+            if (e.target.id === 'menu-toggle') {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            }
+            // Close sidebar when clicking overlay
+            if (e.target.id === 'overlay') {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+        });
+        
+        // Add contact buttons
+        addPrimaryContactBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const fieldset = createContactFieldset('primary');
+            primaryContactsContainer.appendChild(fieldset);
+        });
+        
+        addSecondaryContactBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const fieldset = createContactFieldset('secondary');
+            secondaryContactsContainer.appendChild(fieldset);
+        });
+        
+        // Add spare part buttons
+        addSparePartBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const fieldset = createSparePartFieldset();
+            sparePartsContainer.appendChild(fieldset);
+        });
+        
+        addTaskSparePartBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const fieldset = createSparePartFieldset();
+            taskSparePartsContainer.appendChild(fieldset);
+        });
+        
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (login(username, password)) {
+                localStorage.setItem('currentUser', username);
+                localStorage.setItem('userPassword', password);
+            } else {
+                alert('Invalid username or password');
+            }
+        });
+        
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('reg-username').value;
+            const password = document.getElementById('reg-password').value;
+            const confirmPassword = document.getElementById('reg-confirm-password').value;
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            if (register(username, password)) {
+                alert('Registration successful! Please login.');
+                registerScreen.classList.add('hidden');
+                loginScreen.classList.remove('hidden');
+                document.getElementById('username').value = username;
+                document.getElementById('password').value = '';
+                document.getElementById('password').focus();
+            } else {
+                alert('Username already exists');
+            }
+        });
+        
+        showRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginScreen.classList.add('hidden');
+            registerScreen.classList.remove('hidden');
+            registerForm.reset();
+        });
+        
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerScreen.classList.add('hidden');
+            loginScreen.classList.remove('hidden');
+            loginForm.reset();
+        });
+        
+        logoutButton.addEventListener('click', logout);
+        
+        function performSearch() {
+            const query = (searchInput.value || searchInputMobile.value).toLowerCase();
+            let filteredItems = [];
+            if (currentView === 'devices') {
+                filteredItems = devices.filter(device =>
+                    device.name.toLowerCase().includes(query) ||
+                    (device.model && device.model.toLowerCase().includes(query)) ||
+                    device.ip.toLowerCase().includes(query) ||
+                    (device.mac && device.mac.toLowerCase().includes(query)) ||
+                    device.type.toLowerCase().includes(query) ||
+                    (device.location && device.location.toLowerCase().includes(query))
+                );
+            } else if (currentView === 'assets') {
+                filteredItems = assets.filter(asset =>
+                    asset.name.toLowerCase().includes(query) ||
+                    (asset.vendor && asset.vendor.toLowerCase().includes(query)) ||
+                    asset.type.toLowerCase().includes(query) ||
+                    (asset.category && asset.category.toLowerCase().includes(query)) ||
+                    (asset.tags && asset.tags.toLowerCase().includes(query)) ||
+                    (asset.location && asset.location.toLowerCase().includes(query))
+                );
+            }
+            renderItems(filteredItems);
+        }
+        
+        searchInput.addEventListener('input', performSearch);
+        searchInputMobile.addEventListener('input', performSearch);
+        addItemButton.addEventListener('click', () => {
+            if (currentView === 'devices') {
+                handleAddDevice();
+            } else if (currentView === 'assets') {
+                handleAddAsset();
+            }
+        });
+        addFirstItem.addEventListener('click', () => {
+            if (currentView === 'devices') {
+                handleAddDevice();
+            } else if (currentView === 'assets') {
+                handleAddAsset();
+            }
+        });
+        cancelDeviceButton.addEventListener('click', closeModal);
+        closeModalBtn.addEventListener('click', closeModal);
+        closeDetailModalBtn.addEventListener('click', closeModal);
+        closeDetailButton.addEventListener('click', closeModal);
+        cancelDeleteButton.addEventListener('click', closeModal);
+        closeMaintenanceModalBtn.addEventListener('click', closeModal);
+        closeMaintenanceButton.addEventListener('click', closeModal);
+        cancelMaintenanceTaskButton.addEventListener('click', closeModal);
+        closeUsersModalBtn.addEventListener('click', closeModal);
+        addUserButton.addEventListener('click', handleAddUser);
+        cancelUserButton.addEventListener('click', closeModal);
+        addMaintenanceTaskBtn.addEventListener('click', handleAddMaintenanceTask);
+        
+        confirmDeleteButton.addEventListener('click', (e) => {
+            const id = e.target.dataset.id;
+            if (id.startsWith('device-')) {
+                // Delete device
+                const deviceId = parseInt(id.split('-')[1]);
+                devices = devices.filter(device => device.id !== deviceId);
+                saveUserDevices();
+                renderItems(devices);
+            } else if (id.startsWith('asset-')) {
+                // Delete asset
+                const assetId = parseInt(id.split('-')[1]);
+                assets = assets.filter(asset => asset.id !== assetId);
+                saveUserDevices();
+                renderItems(assets);
+            } else if (id.startsWith('task-')) {
+                // Delete maintenance task
+                const taskId = parseInt(id.split('-')[1]);
+                maintenanceTasks = maintenanceTasks.filter(task => task.id !== taskId);
+                saveUserDevices();
+                renderMaintenanceSchedule();
+            } else if (id.startsWith('user-')) {
+                // Delete user
+                const userId = parseInt(id.split('-')[1]);
+                users = users.filter(user => user.id !== userId);
+                saveUsers();
+                renderUsers();
+            }
+            closeModal();
+        });
+        
+        deviceForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Collect primary contacts
+            const primaryContacts = [];
+            primaryContactsContainer.querySelectorAll('div[data-contact-id]').forEach(contactDiv => {
+                const contactId = contactDiv.dataset.contactId;
+                primaryContacts.push({
+                    name: document.getElementById(`primary-contact-name-${contactId}`).value,
+                    role: document.getElementById(`primary-contact-role-${contactId}`).value,
+                    email: document.getElementById(`primary-contact-email-${contactId}`).value,
+                    phone: document.getElementById(`primary-contact-phone-${contactId}`).value
+                });
+            });
+            // Collect secondary contacts
+            const secondaryContacts = [];
+            secondaryContactsContainer.querySelectorAll('div[data-contact-id]').forEach(contactDiv => {
+                const contactId = contactDiv.dataset.contactId;
+                secondaryContacts.push({
+                    name: document.getElementById(`secondary-contact-name-${contactId}`).value,
+                    role: document.getElementById(`secondary-contact-role-${contactId}`).value,
+                    email: document.getElementById(`secondary-contact-email-${contactId}`).value,
+                    phone: document.getElementById(`secondary-contact-phone-${contactId}`).value
+                });
+            });
+            // Collect spare parts
+            const spareParts = [];
+            sparePartsContainer.querySelectorAll('div[data-part-id]').forEach(partDiv => {
+                const partId = partDiv.dataset.partId;
+                spareParts.push({
+                    name: document.getElementById(`spare-part-name-${partId}`).value,
+                    partNumber: document.getElementById(`spare-part-part-number-${partId}`).value,
+                    quantity: document.getElementById(`spare-part-quantity-${partId}`).value,
+                    supplier: document.getElementById(`spare-part-supplier-${partId}`).value
+                });
+            });
+            const deviceData = {
+                id: deviceIdInput.value ? parseInt(deviceIdInput.value) : devices.length > 0 ? Math.max(...devices.map(d => d.id)) + 1 : 1,
+                uniqueCode: deviceUniqueCodeInput.value || generateUniqueCode('DEV'),
+                name: deviceNameInput.value,
+                model: deviceModelInput.value || null,
+                ip: deviceIpInput.value,
+                mac: deviceMacInput.value || null,
+                type: deviceTypeInput.value,
+                status: deviceStatusInput.value,
+                category: deviceCategoryInput.value || null,
+                location: deviceLocationInput.value || null,
+                username: deviceUsernameInput.value || null,
+                password: devicePasswordInput.value || null,
+                port: devicePortInput.value ? parseInt(devicePortInput.value) : null,
+                url: deviceUrlInput.value || null,
+                access: deviceAccessInput.value || null,
+                notes: deviceCredsNotesInput.value || null,
+                primaryContacts: primaryContacts.length > 0 ? primaryContacts : null,
+                secondaryContacts: secondaryContacts.length > 0 ? secondaryContacts : null,
+                lastMaintenance: deviceLastMaintenanceInput.value || null,
+                nextMaintenance: deviceNextMaintenanceInput.value || null,
+                maintenanceInterval: deviceMaintenanceIntervalInput.value ? parseInt(deviceMaintenanceIntervalInput.value) : null,
+                maintenanceStatus: deviceMaintenanceStatusInput.value || null,
+                maintenancePriority: deviceMaintenancePriorityInput.value || null,
+                maintenanceCost: deviceMaintenanceCostInput.value ? parseFloat(deviceMaintenanceCostInput.value) : null,
+                maintenanceNotes: deviceMaintenanceNotesInput.value || null,
+                spareParts: spareParts.length > 0 ? spareParts : null,
+                version: deviceVersionInput.value || null,
+                tags: deviceTagsInput.value || null,
+                supportContact: deviceSupportContactInput.value || null,
+                supportPhone: deviceSupportPhoneInput.value || null,
+                purchaseDate: devicePurchaseDateInput.value || null,
+                warrantyExpiry: deviceWarrantyInput.value || null,
+                vendor: deviceVendorInput.value || null,
+                serial: deviceSerialInput.value || null,
+                description: deviceNotesInput.value || null,
+                lastUpdated: new Date().toISOString().split('T')[0]
+            };
+            if (deviceIdInput.value) {
+                // Update existing device
+                const index = devices.findIndex(d => d.id === parseInt(deviceIdInput.value));
+                if (index !== -1) {
+                    devices[index] = deviceData;
+                }
+            } else {
+                // Add new device
+                devices.push(deviceData);
+            }
+            saveUserDevices();
+            renderItems(devices);
+            closeModal();
+        });
+        
+        maintenanceTaskForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Collect spare parts
+            const spareParts = [];
+            taskSparePartsContainer.querySelectorAll('div[data-part-id]').forEach(partDiv => {
+                const partId = partDiv.dataset.partId;
+                spareParts.push({
+                    name: document.getElementById(`spare-part-name-${partId}`).value,
+                    partNumber: document.getElementById(`spare-part-part-number-${partId}`).value,
+                    quantity: document.getElementById(`spare-part-quantity-${partId}`).value,
+                    supplier: document.getElementById(`spare-part-supplier-${partId}`).value
+                });
+            });
+            const taskData = {
+                id: taskIdInput.value ? parseInt(taskIdInput.value) : maintenanceTasks.length > 0 ? Math.max(...maintenanceTasks.map(t => t.id)) + 1 : 1,
+                deviceId: parseInt(taskDeviceSelect.value),
+                deviceName: taskDeviceSelect.options[taskDeviceSelect.selectedIndex].text,
+                name: taskNameInput.value,
+                dueDate: taskDueDateInput.value,
+                priority: taskPriorityInput.value,
+                status: taskStatusInput.value,
+                description: taskDescriptionInput.value || null,
+                assignedTo: taskAssignedToInput.value || null,
+                cost: taskCostInput.value ? parseFloat(taskCostInput.value) : null,
+                duration: taskDurationInput.value ? parseFloat(taskDurationInput.value) : null,
+                spareParts: spareParts.length > 0 ? spareParts : null,
+                completedDate: taskStatusInput.value === 'Completed' ? new Date().toISOString().split('T')[0] : null
+            };
+            if (taskIdInput.value) {
+                // Update existing task
+                const index = maintenanceTasks.findIndex(t => t.id === parseInt(taskIdInput.value));
+                if (index !== -1) {
+                    maintenanceTasks[index] = taskData;
+                }
+            } else {
+                // Add new task
+                maintenanceTasks.push(taskData);
+            }
+            saveUserDevices();
+            renderMaintenanceSchedule();
+            closeModal();
+        });
+        
+        userForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const userId = userIdInput.value ? parseInt(userIdInput.value) : null;
+            const username = userUsernameInput.value;
+            const role = userRoleInput.value;
+            const password = userPasswordInput.value;
+            const confirmPassword = userConfirmPasswordInput.value;
+            
+            // Validation
+            if (!userId && (!password || password !== confirmPassword)) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            if (userId) {
+                // Update existing user
+                const userIndex = users.findIndex(u => u.id === userId);
+                if (userIndex !== -1) {
+                    users[userIndex].username = username;
+                    users[userIndex].role = role;
+                    if (password) {
+                        users[userIndex].password = password;
+                    }
+                }
+            } else {
+                // Add new user
+                if (users.some(u => u.username === username)) {
+                    alert('Username already exists');
+                    return;
+                }
+                users.push({
+                    id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
+                    username,
+                    password,
+                    role,
+                    uniqueCode: generateUniqueCode('USR'),
+                    devices: [],
+                    assets: [],
+                    maintenanceTasks: []
+                });
+            }
+            
+            saveUsers();
+            renderUsers();
+            closeModal();
+        });
+        
+        // Make functions available globally for inline event handlers
+        window.togglePasswordDisplay = togglePasswordDisplay;
+        window.togglePasswordVisibility = togglePasswordVisibility;
+    </script>
+</body>
+</html>
