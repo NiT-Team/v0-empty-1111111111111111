@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Header from "./header"
 import Sidebar from "./sidebar"
-import AnalyticsDashboard from "./analytics-dashboard"
+import DashboardWidgets from "./dashboard-widgets" // Import DashboardWidgets component
 import DevicesView from "./devices-view"
 import AssetsView from "./assets-view"
 import InventoryView from "./inventory-view"
@@ -25,6 +25,12 @@ import AIChatView from "./ai-chat-view" // Import AIChatView
 import AIModelsView from "./ai-models-view" // Import AIModelsView
 import ProjectMaterialsView from "./project-materials-view"
 import ProjectsView from "./projects-view" // Import ProjectsView component
+import NotepadView from "./notepad-view" // Import NotepadView component
+import FileManagerView from "./file-manager-view" // Import FileManagerView component
+import NotificationsView from "./notifications-view" // Import NotificationsView component
+import AdvancedSearchView from "./advanced-search-view" // Import AdvancedSearchView component
+import DataExportImportView from "./data-export-import-view" // Import DataExportImportView component
+import APIDocumentationView from "./api-documentation-view" // Import APIDocumentationView component
 import type {
   User,
   Device,
@@ -69,6 +75,12 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
     | "ai-models"
     | "project-materials"
     | "projects" // Add projects to the view type union
+    | "notepad" // Add notepad to the view type union
+    | "file-manager" // Add file-manager to the view type union
+    | "notifications" // Add notifications to the view type union
+    | "advanced-search" // Add advanced-search to view types
+    | "data-export-import" // Add data-export-import to view types
+    | "api-documentation" // Add api-documentation to view types
   >("analytics")
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [devices, setDevices] = useState<Device[]>([])
@@ -84,6 +96,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
   const [aiProviders, setAIProviders] = useState<AIProvider[]>([])
   const [projects, setProjects] = useState<Project[]>([])
   const [projectMaterials, setProjectMaterials] = useState<ProjectMaterial[]>([])
+  const [notifications, setNotifications] = useState<any[]>([]) // Add notifications state
 
   const { canAccessView } = usePermissions(user)
 
@@ -500,6 +513,30 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
       setProjectMaterials(sampleMaterials)
       localStorage.setItem("infonit_project_materials", JSON.stringify(sampleMaterials))
     }
+
+    const storedNotifications = localStorage.getItem("infonit_notifications")
+    if (storedNotifications) {
+      setNotifications(JSON.parse(storedNotifications))
+    } else {
+      const defaultNotifications: any[] = [
+        {
+          id: 1,
+          title: "System Update Available",
+          message: "A new system update is available. Please review and apply.",
+          timestamp: new Date().toISOString(),
+          read: false,
+        },
+        {
+          id: 2,
+          title: "Backup Completed",
+          message: "System backup completed successfully.",
+          timestamp: new Date().toISOString(),
+          read: true,
+        },
+      ]
+      setNotifications(defaultNotifications)
+      localStorage.setItem("infonit_notifications", JSON.stringify(defaultNotifications))
+    }
   }, [user.id])
 
   const renderCurrentView = () => {
@@ -515,7 +552,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
 
     switch (currentView) {
       case "analytics":
-        return <AnalyticsDashboard />
+        return <DashboardWidgets /> // Replace AnalyticsDashboard with DashboardWidgets
       case "devices":
         return <DevicesView devices={devices} setDevices={setDevices} user={user} />
       case "assets":
@@ -552,8 +589,20 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         )
       case "project-materials":
         return <ProjectMaterialsView projects={projects} user={user} />
-      case "projects": // Add projects case to render ProjectsView
+      case "projects":
         return <ProjectsView user={user} />
+      case "notepad":
+        return <NotepadView />
+      case "file-manager":
+        return <FileManagerView />
+      case "notifications":
+        return <NotificationsView notifications={notifications} setNotifications={setNotifications} user={user} />
+      case "advanced-search":
+        return <AdvancedSearchView />
+      case "data-export-import":
+        return <DataExportImportView />
+      case "api-documentation":
+        return <APIDocumentationView />
       case "access-rights":
         return <AccessRightsView currentUser={user} />
       case "development":
@@ -567,7 +616,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
       case "audit":
         return <AuditLog />
       default:
-        return <AnalyticsDashboard />
+        return <DashboardWidgets /> // Replace AnalyticsDashboard with DashboardWidgets
     }
   }
 

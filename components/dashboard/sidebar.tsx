@@ -25,7 +25,13 @@ interface SidebarProps {
       | "development"
       | "god-mode"
       | "project-materials"
-      | "projects",
+      | "projects"
+      | "notepad"
+      | "file-manager"
+      | "notifications"
+      | "advanced-search"
+      | "data-export-import"
+      | "api-documentation",
   ) => void
   isOpen: boolean
   onClose: () => void
@@ -114,6 +120,42 @@ export default function Sidebar({ currentView, onViewChange, isOpen, onClose, us
       label: "Tasks & Lists",
       icon: "fas fa-tasks",
       roles: ["superuser", "admin", "user", "portal"],
+    },
+    {
+      id: "notepad",
+      label: "Personal Notepad",
+      icon: "fas fa-sticky-note",
+      roles: ["superuser", "admin", "user", "portal"],
+    },
+    {
+      id: "file-manager",
+      label: "File Manager",
+      icon: "fas fa-folder",
+      roles: ["superuser", "admin", "user", "portal"],
+    },
+    {
+      id: "notifications",
+      label: "Notifications",
+      icon: "fas fa-bell",
+      roles: ["superuser", "admin", "user", "portal"],
+    },
+    {
+      id: "advanced-search",
+      label: "Advanced Search",
+      icon: "fas fa-search",
+      roles: ["superuser", "admin", "user", "portal"],
+    },
+    {
+      id: "data-export-import",
+      label: "Data Export/Import",
+      icon: "fas fa-exchange-alt",
+      roles: ["superuser", "admin"],
+    },
+    {
+      id: "api-documentation",
+      label: "API Documentation",
+      icon: "fas fa-book",
+      roles: ["superuser", "admin"],
     },
     {
       id: "ai-chat",
@@ -238,6 +280,11 @@ export default function Sidebar({ currentView, onViewChange, isOpen, onClose, us
                     ${item.id === "development" ? "border border-red-200" : ""} 
                     ${item.id === "god-mode" ? "border border-yellow-300 bg-yellow-50" : ""}
                     ${item.id === "ai-chat" || item.id === "ai-models" ? "border border-green-200" : ""}
+                    ${item.id === "file-manager" ? "border border-gray-200" : ""}
+                    ${item.id === "notifications" ? "border border-blue-200" : ""} 
+                    ${item.id === "advanced-search" ? "border border-indigo-200" : ""} 
+                    ${item.id === "data-export-import" ? "border border-orange-200" : ""} 
+                    ${item.id === "api-documentation" ? "border border-teal-200" : ""} 
                   `}
                 >
                   <i className={`${item.icon} mr-3 ${currentView === item.id ? "text-blue-600" : "text-gray-500"}`}></i>
@@ -253,6 +300,24 @@ export default function Sidebar({ currentView, onViewChange, isOpen, onClose, us
                   )}
                   {item.id === "ai-models" && (
                     <span className="ml-auto text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">CFG</span>
+                  )}
+                  {item.id === "notepad" && (
+                    <span className="ml-auto text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">NOTEPAD</span>
+                  )}
+                  {item.id === "file-manager" && (
+                    <span className="ml-auto text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">FILES</span>
+                  )}
+                  {item.id === "notifications" && (
+                    <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">ALERTS</span>
+                  )}
+                  {item.id === "advanced-search" && (
+                    <span className="ml-auto text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded">SEARCH</span>
+                  )}
+                  {item.id === "data-export-import" && (
+                    <span className="ml-auto text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">DATA</span>
+                  )}
+                  {item.id === "api-documentation" && (
+                    <span className="ml-auto text-xs bg-teal-100 text-teal-700 px-2 py-1 rounded">API</span>
                   )}
                 </button>
               </li>
@@ -297,6 +362,12 @@ function getDefaultPermissions(role: string) {
         tasks: { view: true, create: false, edit: false, delete: false },
         aiChat: { view: true, create: true, edit: false, delete: false, configure: false },
         projects: { view: false, create: false, edit: false, delete: false, manage: false },
+        notepad: { view: true, create: true, edit: true, delete: true },
+        fileManager: { view: true, create: true, edit: true, delete: true },
+        notifications: { view: true, create: false, edit: false, delete: false },
+        advancedSearch: { view: true, create: false, edit: false, delete: false },
+        dataExportImport: { view: false, create: false, edit: false, delete: false },
+        apiDocumentation: { view: false, create: false, edit: false, delete: false },
       }
     case "admin":
       return {
@@ -329,6 +400,12 @@ function getDefaultPermissions(role: string) {
         tasks: { view: true, create: true, edit: true, delete: true },
         aiChat: { view: true, create: true, edit: true, delete: true, configure: true },
         projects: { view: true, create: true, edit: true, delete: true, manage: true },
+        notepad: { view: true, create: true, edit: true, delete: true },
+        fileManager: { view: true, create: true, edit: true, delete: true },
+        notifications: { view: true, create: false, edit: false, delete: false },
+        advancedSearch: { view: true, create: false, edit: false, delete: false },
+        dataExportImport: { view: true, create: true, edit: true, delete: true },
+        apiDocumentation: { view: true, create: false, edit: false, delete: false },
       }
     default: // regular user
       return {
@@ -361,6 +438,12 @@ function getDefaultPermissions(role: string) {
         tasks: { view: true, create: false, edit: false, delete: false },
         aiChat: { view: true, create: true, edit: false, delete: false, configure: false },
         projects: { view: false, create: false, edit: false, delete: false, manage: false },
+        notepad: { view: true, create: true, edit: true, delete: true },
+        fileManager: { view: true, create: true, edit: true, delete: true },
+        notifications: { view: true, create: false, edit: false, delete: false },
+        advancedSearch: { view: true, create: false, edit: false, delete: false },
+        dataExportImport: { view: false, create: false, edit: false, delete: false },
+        apiDocumentation: { view: false, create: false, edit: false, delete: false },
       }
   }
 }
