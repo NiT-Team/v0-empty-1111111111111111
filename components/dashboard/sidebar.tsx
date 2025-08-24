@@ -209,7 +209,7 @@ export default function Sidebar({ currentView, onViewChange, isOpen, onClose, us
       {/* Sidebar */}
       <aside
         className={`
-        fixed md:static z-50 bg-white shadow-md h-screen w-64 transform transition-transform duration-300
+        fixed md:static z-50 bg-white shadow-md h-full w-64 transform transition-transform duration-300 top-16
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
       `}
       >

@@ -584,12 +584,11 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
           user={user}
         />
 
-        <main className="flex-1 flex flex-col p-6 md:ml-64">
-          <div className="flex-1">{renderCurrentView()}</div>
+        <main className="flex-1 flex flex-col ml-0 md:ml-64 transition-all duration-300">
+          <div className="flex-1 p-6">{renderCurrentView()}</div>
+          <AppFooter />
         </main>
       </div>
-
-      <AppFooter />
     </div>
   )
 }
