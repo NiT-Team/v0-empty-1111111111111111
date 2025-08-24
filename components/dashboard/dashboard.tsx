@@ -584,7 +584,9 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
           user={user}
         />
 
-        <main className="flex-grow p-6 md:ml-64">{renderCurrentView()}</main>
+        <main className="flex-1 flex flex-col p-6 md:ml-64">
+          <div className="flex-1">{renderCurrentView()}</div>
+        </main>
       </div>
 
       <AppFooter />
